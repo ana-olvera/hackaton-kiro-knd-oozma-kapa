@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import * as Phaser from 'phaser';
 import { OfficeScene } from '../../game/scenes/office.scene';
 import { MenuScene } from '../../game/scenes/menu.scene';
+import { GitBasicScene } from '../../game/minigames/git-basic/git-basic.scene';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,7 @@ export class GameEngineService {
           debug: false
         }
       },
-      scene: [MenuScene, OfficeScene],
+      scene: [MenuScene, OfficeScene, GitBasicScene],
       scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH

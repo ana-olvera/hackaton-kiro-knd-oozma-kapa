@@ -1,0 +1,62 @@
+{
+  "frames": {
+    "happy": {
+      "frame": { "x": 115, "y": 65, "w": 170, "h": 170 },
+      "sourceSize": { "w": 170, "h": 170 }
+    },
+    "tired": {
+      "frame": { "x": 355, "y": 65, "w": 170, "h": 170 },
+      "sourceSize": { "w": 170, "h": 170 }
+    },
+    "sleeping": {
+      "frame": { "x": 590, "y": 65, "w": 190, "h": 170 },
+      "sourceSize": { "w": 190, "h": 170 }
+    },
+    "angry": {
+      "frame": { "x": 870, "y": 65, "w": 180, "h": 170 },
+      "sourceSize": { "w": 180, "h": 170 }
+    },
+    "stressed": {
+      "frame": { "x": 50, "y": 280, "w": 185, "h": 180 },
+      "sourceSize": { "w": 185, "h": 180 }
+    },
+    "surprised": {
+      "frame": { "x": 265, "y": 280, "w": 170, "h": 180 },
+      "sourceSize": { "w": 170, "h": 180 }
+    },
+    "confused": {
+      "frame": { "x": 480, "y": 275, "w": 180, "h": 185 },
+      "sourceSize": { "w": 180, "h": 185 }
+    },
+    "proud": {
+      "frame": { "x": 715, "y": 285, "w": 160, "h": 175 },
+      "sourceSize": { "w": 160, "h": 175 }
+    },
+    "scared": {
+      "frame": { "x": 940, "y": 280, "w": 175, "h": 180 },
+      "sourceSize": { "w": 175, "h": 180 }
+    },
+    "thinking": {
+      "frame": { "x": 75, "y": 510, "w": 180, "h": 180 },
+      "sourceSize": { "w": 180, "h": 180 }
+    },
+    "crying": {
+      "frame": { "x": 295, "y": 510, "w": 170, "h": 180 },
+      "sourceSize": { "w": 170, "h": 180 }
+    },
+    "desperate": {
+      "frame": { "x": 520, "y": 510, "w": 180, "h": 180 },
+      "sourceSize": { "w": 180, "h": 180 }
+    },
+    "eating": {
+      "frame": { "x": 745, "y": 510, "w": 175, "h": 180 },
+      "sourceSize": { "w": 175, "h": 180 }
+    }
+  },
+  "meta": {
+    "image": "gestos_michigodin.jpeg",
+    "format": "RGBA8888",
+    "size": { "w": 1280, "h": 714 },
+    "scale": "1"
+  }
+}

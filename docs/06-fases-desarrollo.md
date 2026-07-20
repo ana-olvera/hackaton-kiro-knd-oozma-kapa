@@ -1,111 +1,132 @@
 # Fases de Desarrollo - Ayuda a Michi Godín
 
-## Fase 1: MVP (2-3 semanas) ✅ COMPLETADA
-
-### Objetivos
-Tener un juego funcional con mecánicas básicas jugable en navegador.
+## Fase 1: MVP ✅ COMPLETADA
 
 ### Tareas
+- [x] Setup Angular 17 + PWA + Phaser.js
+- [x] Sprites programáticos, TypeScript, sin backend, IndexedDB
+- [x] Escena de oficina (tilemap 25x18, colisiones)
+- [x] Michi jugable (4 direcciones, physics, animaciones)
+- [x] Karen enviando mensajes (karenómetro, frecuencia adaptiva)
+- [x] Minijuego git add/commit/push
+- [x] HUD (6 stats + karenómetro + reloj)
+- [x] Sistema de tiempo (9AM-6PM, eventos por hora)
 
-- [x] Setup inicial Angular 17 + PWA
-- [x] Integración de Phaser.js
-- [x] Sprites pixel art 32×32 (generados programáticamente)
-- [x] Todo en TypeScript
-- [x] Sin backend (funciona standalone)
-- [x] Guardado local con IndexedDB
-- [x] Escena de oficina básica (tilemap 25x18, mobiliario, colisiones)
-- [x] Personaje Michi jugable (animaciones 4 direcciones, physics body)
-- [x] Karen enviando mensajes (sistema tipo Teams, karenómetro, frecuencia adaptiva)
-- [x] Minijuego básico (git add/commit/push en orden correcto)
-- [x] Barra de estados funcional (HUD con 6 stats + karenómetro + reloj)
-- [x] Sistema de tiempo (9 AM - 6 PM, eventos por hora, game over/victoria)
+---
 
-### Implementación Técnica
+## Fase 2: Contenido ✅ COMPLETADA
+
+### Tareas
+- [x] Sistema de logros (14 logros, tracking, persistencia)
+- [x] Tienda de skins (9 skins, puntos, compra/equipar)
+- [x] Audio (Web Audio API, 8 efectos programáticos)
+- [x] NPCs: Michi QA, Becatín, Michi News (7 diálogos c/u)
+- [x] Eventos aleatorios (8 negativos + 5 positivos)
+- [x] Diálogos humorísticos (7 secuencias multi-personaje)
+- [x] Progresión (5 niveles Lun-Vie, estrellas, desbloqueo)
+- [x] Minijuegos Git: staging, branches, merge, conflicts
+- [x] Jefes finales (3 bosses con timer y HP)
+
+---
+
+## Fase 3: Polish y Viralidad ✅ COMPLETADA
+
+### Tareas
+- [x] Generador de certificados (Canvas API, PNG descargable)
+- [x] Compartir en LinkedIn (Web Share API + fallback)
+- [x] Verificación QR (backend endpoint + generación qrcode)
+- [x] Ranking online (backend + frontend con offline fallback)
+- [x] Controles móviles (D-pad virtual + botón interacción)
+- [x] PWA instalable (manifest, service worker, offline, prompt)
+- [x] Localización ES/EN (80+ claves, detección automática)
+- [x] Integración completa de todos los sistemas en OfficeScene
+
+### Implementación Técnica Fase 3
 
 | Sistema | Archivo | Descripción |
 |---------|---------|-------------|
-| Sprites | `game/assets/sprite-generator.ts` | Genera texturas programáticamente (Michi, Karen, tiles, items, UI) |
-| Oficina | `game/scenes/office.scene.ts` | Escena principal con tilemap, colisiones, interacciones |
-| Karen | `game/systems/karen-system.ts` | Mensajes periódicos, impacto en estrés, frecuencia adaptiva |
-| Tiempo | `game/systems/time-system.ts` | Reloj 9AM-6PM, eventos por hora, fin del día |
-| HUD | `game/systems/hud-system.ts` | Barras de estado, colores dinámicos, karenómetro |
-| Minijuego | `game/minigames/git-basic/git-basic.scene.ts` | git add→commit→push en orden |
-| Engine | `core/game-engine/game-engine.service.ts` | Configuración Phaser + registro de escenas |
-
-### Mecánicas Implementadas
-
-- **Movimiento:** Flechas del teclado, animaciones walk/idle en 4 direcciones
-- **Interacción:** Tecla E para cafetera (+café, +energía) y computadoras (minijuego)
-- **Degradación:** Stats se degradan cada 5 segundos automáticamente
-- **Game Over:** Estrés llega a 100 o energía llega a 0
-- **Victoria:** Sobrevivir hasta las 6 PM
-- **Eventos temporales:** Daily meeting (10AM), hambre (1PM), sueño post-comida (3PM)
+| Certificados | `certificate/certificate-generator.ts` | Canvas API, diseño completo, UUID, descarga PNG |
+| LinkedIn | `certificate/share-linkedin.ts` | Texto optimizado, Web Share API, clipboard |
+| QR Backend | `backend/modules/certificates/` | Endpoint verify + QR con qrcode lib |
+| Rankings | `systems/ranking-system.ts` | Submit/get, offline con localStorage, sync |
+| Mobile | `systems/mobile-controls.ts` | D-pad + botón E, auto-detección táctil |
+| PWA | `systems/pwa-manager.ts` | Install prompt, update check, offline detection |
+| i18n | `systems/i18n-system.ts` | ES/EN, 80+ claves, detección navegador |
+| Integración | `scenes/office.scene.ts` | Todos los sistemas conectados y funcionando |
 
 ---
 
-## Fase 2: Contenido (3-4 semanas)
+## Resumen del Proyecto Completo
 
-### Objetivos
-Expandir el contenido del juego con todos los personajes, niveles y mecánicas.
+### Frontend (Angular 17 + Phaser.js)
+```
+src/app/
+├── core/                    # GameEngine service
+├── game/
+│   ├── assets/              # Sprite generator
+│   ├── scenes/              # Menu, Office, Boss
+│   ├── systems/             # 14 sistemas
+│   │   ├── achievements-system.ts
+│   │   ├── audio-system.ts
+│   │   ├── dialogue-system.ts
+│   │   ├── events-system.ts
+│   │   ├── hud-system.ts
+│   │   ├── i18n-system.ts
+│   │   ├── karen-system.ts
+│   │   ├── mobile-controls.ts
+│   │   ├── npc-system.ts
+│   │   ├── portrait-system.ts
+│   │   ├── progression-system.ts
+│   │   ├── pwa-manager.ts
+│   │   ├── ranking-system.ts
+│   │   ├── skins-system.ts
+│   │   └── time-system.ts
+│   ├── minigames/           # 5 minijuegos
+│   │   ├── git-basic/
+│   │   ├── git-staging/
+│   │   ├── git-branches/
+│   │   ├── git-merge/
+│   │   └── git-conflict/
+│   └── entities/
+├── certificate/             # Generador + LinkedIn share
+├── ui/                      # Menú principal Angular
+└── shared/
+```
 
-### Tareas
+### Backend (Node.js + Express + TypeScript)
+```
+src/
+├── modules/
+│   ├── certificates/        # Generar, verificar, QR
+│   ├── rankings/            # Top scores, submit
+│   └── auth/                # JWT middleware
+├── config/
+└── main.ts
+```
 
-- [ ] Sistema de logros
-- [ ] Tienda de skins para Michi
-- [ ] Música y efectos de sonido
-- [ ] Más personajes (Michi QA, Becatín, Michi News)
-- [ ] Eventos aleatorios (VPN caída, Windows Update, reunión sorpresa)
-- [ ] Diálogos humorísticos
-- [ ] Sistema de progresión (desbloqueo de niveles)
-- [ ] Todos los minijuegos de Git (staging, branches, merge, conflicts)
-- [ ] Jefes finales
+### Escenas del Juego (9 total)
+| Escena | Propósito |
+|--------|-----------|
+| MenuScene | Menú principal con splash art |
+| OfficeScene | Gameplay principal |
+| HudScene | UI overlay sin zoom |
+| GitBasicScene | Minijuego: add/commit/push |
+| GitStagingScene | Minijuego: staging area |
+| GitBranchesScene | Minijuego: elegir branch |
+| GitMergeScene | Minijuego: aprobar/rechazar merge |
+| GitConflictScene | Minijuego: resolver conflictos |
+| BossScene | Jefes finales (3 niveles) |
 
----
-
-## Fase 3: Polish y Viralidad (2-3 semanas)
-
-### Objetivos
-Pulir la experiencia, agregar funcionalidades sociales y preparar para lanzamiento.
-
-### Tareas
-
-- [ ] Ranking en línea (requiere backend)
-- [ ] Editor de niveles (opcional)
-- [ ] Generador de certificados PDF
-- [ ] Integración con LinkedIn
-- [ ] Verificación de certificados con QR (requiere backend)
-- [ ] Optimización para móviles
-- [ ] PWA instalable
-- [ ] Testing y balanceo
-- [ ] Localización (ES/EN)
-
----
-
-## Assets Necesarios
-
-### Sprites (Pixel Art 32×32 o 48×48)
-
-- [x] Michi Godín (generado programáticamente, 4 direcciones × 4 frames)
-- [x] Karen (retrato 48×48 para diálogos)
-- [x] Oficina (tiles: piso, pared, escritorio, compu, cafetera, silla)
-- [x] Items (café, dona, concha, pizza)
-- [x] UI elements (iconos para barras de estado)
-- [ ] Michi Testings / Michi QA
-- [ ] Becatín
-- [ ] Michi News
-- [ ] MichiOps
-- [ ] SQLino
-
-### Audio
-
-- [ ] Música de fondo (office vibes)
-- [ ] Efectos de sonido (Teams notification, keyboard, café)
-- [ ] Voces de personajes (opcional)
-
-### UI
-
-- [x] HUD de estados
-- [x] Karenómetro animado
-- [ ] Diálogos estilo chat (parcial - Karen notifications implementadas)
-- [x] Menús (MenuScene con instrucciones)
-- [ ] Certificado template
+### Estadísticas
+- **14 sistemas** de juego integrados
+- **5 minijuegos** de Git
+- **3 jefes finales**
+- **14 logros** rastreables
+- **9 skins** desbloqueables
+- **13 eventos** aleatorios
+- **7 secuencias** de diálogo
+- **5 niveles** de progresión
+- **3 personajes** NPC
+- **2 idiomas** (ES/EN)
+- **8 efectos** de sonido
+- **PWA instalable** con offline

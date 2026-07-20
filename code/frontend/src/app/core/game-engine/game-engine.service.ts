@@ -2,7 +2,13 @@ import { Injectable } from '@angular/core';
 import * as Phaser from 'phaser';
 import { OfficeScene } from '../../game/scenes/office.scene';
 import { MenuScene } from '../../game/scenes/menu.scene';
+import { BossScene } from '../../game/scenes/boss.scene';
 import { GitBasicScene } from '../../game/minigames/git-basic/git-basic.scene';
+import { GitStagingScene } from '../../game/minigames/git-staging/git-staging.scene';
+import { GitBranchesScene } from '../../game/minigames/git-branches/git-branches.scene';
+import { GitMergeScene } from '../../game/minigames/git-merge/git-merge.scene';
+import { GitConflictScene } from '../../game/minigames/git-conflict/git-conflict.scene';
+import { HudScene } from '../../game/systems/hud-system';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +34,17 @@ export class GameEngineService {
           debug: false
         }
       },
-      scene: [MenuScene, OfficeScene, GitBasicScene],
+      scene: [
+        MenuScene,
+        OfficeScene,
+        HudScene,
+        GitBasicScene,
+        GitStagingScene,
+        GitBranchesScene,
+        GitMergeScene,
+        GitConflictScene,
+        BossScene
+      ],
       scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH

@@ -334,6 +334,18 @@ export class OfficeScene extends Phaser.Scene {
     this.updateHud();
     this.portraitSystem.setTemporaryEmotion('surprised', 2000);
     this.audioSystem.playTeamsNotification();
+
+    // Mostrar notificación en HUD (sin zoom)
+    this.hudSystem.showNotification({
+      title: 'Karen',
+      text: msg.text,
+      color: '#FF6B6B',
+      icon: '💬',
+      subtext: `+${msg.stressImpact} estrés`,
+      position: 'bottom-center',
+      duration: 4000
+    });
+
     if (this.gameState.stress >= 100) this.handleGameOver('estrés');
   }
 
@@ -349,7 +361,6 @@ export class OfficeScene extends Phaser.Scene {
         this.gameState.energy = Math.max(0, Math.min(100, this.gameState.energy + effect.value));
         break;
       case 'time':
-        // Perder/ganar tiempo no afecta stats directamente, solo el score
         this.gameState.score += effect.value;
         break;
       case 'happiness':
@@ -381,6 +392,17 @@ export class OfficeScene extends Phaser.Scene {
       this.audioSystem.playError();
       this.portraitSystem.setTemporaryEmotion('scared', 3000);
     }
+
+    // Notificación en HUD
+    this.hudSystem.showNotification({
+      title: event.name,
+      text: event.description,
+      color: event.positive ? '#00FF88' : '#FF4444',
+      icon: event.icon,
+      position: 'bottom-center',
+      duration: 4000
+    });
+
     this.updateHud();
   }
 

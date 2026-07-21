@@ -234,6 +234,75 @@ export class HudScene extends Phaser.Scene {
     };
     return colors[emotion] || 0xFFFFFF;
   }
+
+  showNotification(config: {
+    title: string;
+    text: string;
+    color: string;
+    icon?: string;
+    subtext?: string;
+    position?: 'top-right' | 'top-center' | 'bottom-center';
+    duration?: number;
+  }): void {
+    const pos = config.position || 'top-right';
+    const duration = config.duration || 4000;
+
+    let x = 650, y = -50, targetY = 50;
+    if (pos === 'top-center') { x = 400; y = -50; targetY = 60; }
+    if (pos === 'bottom-center') { x = 400; y = 650; targetY = 540; }
+
+    const container = this.add.container(x, y);
+    container.setDepth(1500);
+
+    const colorNum = Phaser.Display.Color.HexStringToColor(config.color).color;
+    const bg = this.add.rectangle(0, 0, 220, 55, 0x111133, 0.95);
+    bg.setStrokeStyle(2, colorNum);
+
+    const elements: Phaser.GameObjects.GameObject[] = [bg];
+
+    if (config.icon) {
+      const icon = this.add.text(-95, -15, config.icon, { fontSize: '14px' });
+      elements.push(icon);
+    }
+
+    const title = this.add.text(-75, -18, config.title, {
+      fontSize: '9px', color: config.color, fontStyle: 'bold'
+    });
+    elements.push(title);
+
+    const text = this.add.text(-95, 2, config.text, {
+      fontSize: '9px', color: '#FFFFFF', wordWrap: { width: 180 }
+    });
+    elements.push(text);
+
+    if (config.subtext) {
+      const sub = this.add.text(-95, 18, config.subtext, {
+        fontSize: '8px', color: '#FF4444'
+      });
+      elements.push(sub);
+    }
+
+    container.add(elements);
+
+    // Animación entrada
+    this.tweens.add({
+      targets: container,
+      y: targetY,
+      duration: 400,
+      ease: 'Back.easeOut'
+    });
+
+    // Salida
+    this.time.delayedCall(duration, () => {
+      this.tweens.add({
+        targets: container,
+        alpha: 0,
+        y: targetY - 30,
+        duration: 300,
+        onComplete: () => container.destroy()
+      });
+    });
+  }
 }
 
 /**
@@ -268,6 +337,18 @@ export class HudSystem {
 
   updatePortrait(emotion: string): void {
     this.hudScene?.updatePortrait(emotion);
+  }
+
+  showNotification(config: {
+    title: string;
+    text: string;
+    color: string;
+    icon?: string;
+    subtext?: string;
+    position?: 'top-right' | 'top-center' | 'bottom-center';
+    duration?: number;
+  }): void {
+    this.hudScene?.showNotification(config);
   }
 
   destroy(): void {

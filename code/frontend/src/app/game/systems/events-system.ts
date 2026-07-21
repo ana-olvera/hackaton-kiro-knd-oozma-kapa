@@ -181,40 +181,40 @@ export class EventsSystem {
   }
 
   private showEventNotification(event: OfficeEvent): void {
-    const cam = this.scene.cameras.main;
-    const x = cam.width / 2;
-    const y = 100;
+    // Bottom-center del viewport con zoom 2x
+    const x = 200;
+    const y = 280;
 
-    this.eventContainer = this.scene.add.container(x, y - 60);
+    this.eventContainer = this.scene.add.container(x, y + 20);
     this.eventContainer.setScrollFactor(0);
     this.eventContainer.setDepth(1800);
 
     const bgColor = event.positive ? 0x003300 : 0x330000;
     const borderColor = event.positive ? 0x00FF88 : 0xFF4444;
 
-    const bg = this.scene.add.rectangle(0, 0, 280, 55, bgColor, 0.95);
-    bg.setStrokeStyle(2, borderColor);
+    const bg = this.scene.add.rectangle(0, 0, 150, 30, bgColor, 0.95);
+    bg.setStrokeStyle(1, borderColor);
 
-    const icon = this.scene.add.text(-125, -15, event.icon, { fontSize: '18px' });
-    const title = this.scene.add.text(-95, -18, event.name, {
-      fontSize: '11px',
+    const icon = this.scene.add.text(-65, -8, event.icon, { fontSize: '10px' });
+    const title = this.scene.add.text(-48, -9, event.name, {
+      fontSize: '7px',
       color: event.positive ? '#00FF88' : '#FF6666',
       fontStyle: 'bold'
     });
-    const desc = this.scene.add.text(-125, 5, event.description, {
-      fontSize: '9px',
+    const desc = this.scene.add.text(-65, 4, event.description, {
+      fontSize: '6px',
       color: '#AAAAAA',
-      wordWrap: { width: 240 }
+      wordWrap: { width: 130 }
     });
 
     this.eventContainer.add([bg, icon, title, desc]);
 
-    // Entrada desde arriba
+    // Entrada desde abajo
     this.scene.tweens.add({
       targets: this.eventContainer,
       y: y,
       duration: 400,
-      ease: 'Bounce.easeOut'
+      ease: 'Back.easeOut'
     });
 
     // Salida
@@ -223,7 +223,7 @@ export class EventsSystem {
         this.scene.tweens.add({
           targets: this.eventContainer,
           alpha: 0,
-          y: y - 40,
+          y: y + 20,
           duration: 300,
           onComplete: () => {
             this.eventContainer?.destroy();

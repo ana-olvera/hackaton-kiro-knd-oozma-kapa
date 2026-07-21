@@ -116,37 +116,38 @@ export class NpcSystem {
 
   private showNpcDialogue(npc: NpcConfig, dialogue: NpcDialogue): void {
     this.cooldown = true;
-    const cam = this.scene.cameras.main;
-    const x = cam.scrollX + cam.width / 2;
-    const y = cam.scrollY + cam.height - 60;
 
-    this.npcContainer = this.scene.add.container(x, y + 100);
+    // Posición ajustada para zoom 2x (viewport real = 400x300)
+    const x = 200; // Centro del viewport con zoom
+    const y = 280; // Parte inferior del viewport con zoom
+
+    this.npcContainer = this.scene.add.container(x, y + 20);
     this.npcContainer.setDepth(1500);
     this.npcContainer.setScrollFactor(0);
 
     // Fondo
-    const bg = this.scene.add.rectangle(0, 0, 320, 70, 0x1a1a3e, 0.95);
-    bg.setStrokeStyle(2, Phaser.Display.Color.HexStringToColor(npc.color).color);
+    const bg = this.scene.add.rectangle(0, 0, 160, 35, 0x1a1a3e, 0.95);
+    bg.setStrokeStyle(1, Phaser.Display.Color.HexStringToColor(npc.color).color);
 
     // Icono y nombre
-    const icon = this.scene.add.text(-145, -25, npc.icon, { fontSize: '16px' });
-    const name = this.scene.add.text(-115, -25, npc.name, {
-      fontSize: '10px',
+    const icon = this.scene.add.text(-70, -12, npc.icon, { fontSize: '10px' });
+    const name = this.scene.add.text(-50, -12, npc.name, {
+      fontSize: '7px',
       color: npc.color,
       fontStyle: 'bold'
     });
 
     // Diálogo
-    const text = this.scene.add.text(-145, -5, dialogue.text, {
-      fontSize: '9px',
+    const text = this.scene.add.text(-70, 0, dialogue.text, {
+      fontSize: '6px',
       color: '#CCCCCC',
-      wordWrap: { width: 280 }
+      wordWrap: { width: 140 }
     });
 
     // Efecto
     const effectText = this.getEffectText(dialogue.effect);
-    const effectLabel = this.scene.add.text(-145, 20, effectText, {
-      fontSize: '8px',
+    const effectLabel = this.scene.add.text(-70, 12, effectText, {
+      fontSize: '6px',
       color: dialogue.effect.value > 0 ? '#FF6666' : '#66FF66'
     });
 
@@ -168,7 +169,7 @@ export class NpcSystem {
 
       this.scene.tweens.add({
         targets: this.npcContainer,
-        y: y + 100,
+        y: 320,
         alpha: 0,
         duration: 300,
         onComplete: () => {

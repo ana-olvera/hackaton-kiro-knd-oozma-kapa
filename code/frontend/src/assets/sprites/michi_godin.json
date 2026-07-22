@@ -1,0 +1,63 @@
+{
+  "frames": {
+    "idle_0": { "frame": { "x": 0, "y": 0, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "idle_1": { "frame": { "x": 204, "y": 0, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "idle_2": { "frame": { "x": 408, "y": 0, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "idle_3": { "frame": { "x": 612, "y": 0, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "idle_4": { "frame": { "x": 816, "y": 0, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+
+    "walk_0": { "frame": { "x": 0, "y": 219, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "walk_1": { "frame": { "x": 204, "y": 219, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "walk_2": { "frame": { "x": 408, "y": 219, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "walk_3": { "frame": { "x": 612, "y": 219, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "walk_4": { "frame": { "x": 816, "y": 219, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+
+    "sleep_0": { "frame": { "x": 0, "y": 438, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "sleep_1": { "frame": { "x": 204, "y": 438, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "sleep_2": { "frame": { "x": 408, "y": 438, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "sleep_3": { "frame": { "x": 612, "y": 438, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+
+    "work_0": { "frame": { "x": 0, "y": 657, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "work_1": { "frame": { "x": 204, "y": 657, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "coffee_0": { "frame": { "x": 408, "y": 657, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "coffee_1": { "frame": { "x": 612, "y": 657, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "coffee_2": { "frame": { "x": 816, "y": 657, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+
+    "stressed_0": { "frame": { "x": 0, "y": 876, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "stressed_1": { "frame": { "x": 204, "y": 876, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "stressed_2": { "frame": { "x": 408, "y": 876, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "stressed_3": { "frame": { "x": 612, "y": 876, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "celebrate_0": { "frame": { "x": 816, "y": 876, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+
+    "confused_0": { "frame": { "x": 0, "y": 1095, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "confused_1": { "frame": { "x": 204, "y": 1095, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "confused_2": { "frame": { "x": 408, "y": 1095, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "sad_0": { "frame": { "x": 612, "y": 1095, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "sad_1": { "frame": { "x": 816, "y": 1095, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+
+    "excited_0": { "frame": { "x": 0, "y": 1314, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "excited_1": { "frame": { "x": 204, "y": 1314, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "excited_2": { "frame": { "x": 408, "y": 1314, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "phone_0": { "frame": { "x": 612, "y": 1314, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } },
+    "phone_1": { "frame": { "x": 816, "y": 1314, "w": 204, "h": 219 }, "sourceSize": { "w": 204, "h": 219 } }
+  },
+  "meta": {
+    "image": "michi_godin.png",
+    "format": "RGBA8888",
+    "size": { "w": 1024, "h": 1536 },
+    "scale": "1"
+  },
+  "animations": {
+    "michi-idle": { "frames": ["idle_0", "idle_1", "idle_2", "idle_3", "idle_4"], "frameRate": 4, "repeat": -1 },
+    "michi-walk": { "frames": ["walk_0", "walk_1", "walk_2", "walk_3", "walk_4"], "frameRate": 8, "repeat": -1 },
+    "michi-sleep": { "frames": ["sleep_0", "sleep_1", "sleep_2", "sleep_3"], "frameRate": 2, "repeat": -1 },
+    "michi-work": { "frames": ["work_0", "work_1"], "frameRate": 4, "repeat": -1 },
+    "michi-coffee": { "frames": ["coffee_0", "coffee_1", "coffee_2"], "frameRate": 3, "repeat": -1 },
+    "michi-stressed": { "frames": ["stressed_0", "stressed_1", "stressed_2", "stressed_3"], "frameRate": 6, "repeat": -1 },
+    "michi-celebrate": { "frames": ["celebrate_0"], "frameRate": 1, "repeat": 0 },
+    "michi-confused": { "frames": ["confused_0", "confused_1", "confused_2"], "frameRate": 4, "repeat": 0 },
+    "michi-sad": { "frames": ["sad_0", "sad_1"], "frameRate": 3, "repeat": -1 },
+    "michi-excited": { "frames": ["excited_0", "excited_1", "excited_2"], "frameRate": 6, "repeat": 0 },
+    "michi-phone": { "frames": ["phone_0", "phone_1"], "frameRate": 3, "repeat": -1 }
+  }
+}

@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser';
 import { SpriteGenerator } from '../assets/sprite-generator';
+import { loadMichiSpritesheet, createMichiAnimations, MichiSprite, MichiState } from '../assets/michi-sprite-loader';
 import { KarenSystem, KarenMessage } from '../systems/karen-system';
 import { TimeSystem } from '../systems/time-system';
 import { HudSystem } from '../systems/hud-system';
@@ -114,6 +115,9 @@ export class OfficeScene extends Phaser.Scene {
       'assets/sprites/gestos_michigodin.jpeg',
       'assets/sprites/gestos_michigodin.json'
     );
+    
+    // Cargar nuevo spritesheet de Michi con animaciones (generado con DALL-E)
+    loadMichiSpritesheet(this);
   }
 
   create(): void {
@@ -151,12 +155,14 @@ export class OfficeScene extends Phaser.Scene {
       }
     }
 
-    // Michi
-    this.michi = this.add.sprite(7 * tileSize, 7 * tileSize, 'michi', 0);
+    // Michi - Usando el nuevo spritesheet de DALL-E
+    // Imagen: 1024x1536, frames de 204x219 px
+    this.michi = this.add.sprite(7 * tileSize, 7 * tileSize, 'michi-spritesheet', 0);
+    this.michi.setScale(0.18); // 204 * 0.18 ≈ 37px, buen tamaño para el juego
     this.physics.add.existing(this.michi);
     const michiBody = this.michi.body as Phaser.Physics.Arcade.Body;
-    michiBody.setSize(20, 20);
-    michiBody.setOffset(6, 12);
+    michiBody.setSize(150, 180);
+    michiBody.setOffset(27, 20);
     michiBody.setCollideWorldBounds(true);
     this.physics.add.collider(this.michi, this.walls);
     this.createMichiAnimations();
@@ -231,21 +237,110 @@ export class OfficeScene extends Phaser.Scene {
   }
 
   private createMichiAnimations(): void {
-    const directions = ['down', 'left', 'right', 'up'];
-    directions.forEach((dir, i) => {
-      const start = i * 4;
+    // Usar las animaciones del nuevo spritesheet de DALL-E
+    // El spritesheet tiene 5 columnas x 7 filas, cada frame de 128x128
+    
+    // Fila 0: Idle (frames 0-4)
+    if (!this.anims.exists('michi-idle')) {
       this.anims.create({
-        key: `michi-idle-${dir}`,
-        frames: [{ key: 'michi', frame: start }],
-        frameRate: 1
+        key: 'michi-idle',
+        frames: this.anims.generateFrameNumbers('michi-spritesheet', { start: 0, end: 4 }),
+        frameRate: 4,
+        repeat: -1
       });
+    }
+
+    // Fila 1: Walk (frames 5-9)
+    if (!this.anims.exists('michi-walk')) {
       this.anims.create({
-        key: `michi-walk-${dir}`,
-        frames: this.anims.generateFrameNumbers('michi', { start, end: start + 3 }),
+        key: 'michi-walk',
+        frames: this.anims.generateFrameNumbers('michi-spritesheet', { start: 5, end: 9 }),
         frameRate: 8,
         repeat: -1
       });
-    });
+    }
+
+    // Fila 2: Sleep (frames 10-13)
+    if (!this.anims.exists('michi-sleep')) {
+      this.anims.create({
+        key: 'michi-sleep',
+        frames: this.anims.generateFrameNumbers('michi-spritesheet', { start: 10, end: 13 }),
+        frameRate: 2,
+        repeat: -1
+      });
+    }
+
+    // Fila 3: Work (frames 15-16) + Coffee (frames 17-19)
+    if (!this.anims.exists('michi-work')) {
+      this.anims.create({
+        key: 'michi-work',
+        frames: this.anims.generateFrameNumbers('michi-spritesheet', { start: 15, end: 16 }),
+        frameRate: 4,
+        repeat: -1
+      });
+    }
+    if (!this.anims.exists('michi-coffee')) {
+      this.anims.create({
+        key: 'michi-coffee',
+        frames: this.anims.generateFrameNumbers('michi-spritesheet', { start: 17, end: 19 }),
+        frameRate: 3,
+        repeat: -1
+      });
+    }
+
+    // Fila 4: Stressed (frames 20-23) + Celebrate (frame 24)
+    if (!this.anims.exists('michi-stressed')) {
+      this.anims.create({
+        key: 'michi-stressed',
+        frames: this.anims.generateFrameNumbers('michi-spritesheet', { start: 20, end: 23 }),
+        frameRate: 6,
+        repeat: -1
+      });
+    }
+    if (!this.anims.exists('michi-celebrate')) {
+      this.anims.create({
+        key: 'michi-celebrate',
+        frames: this.anims.generateFrameNumbers('michi-spritesheet', { start: 24, end: 24 }),
+        frameRate: 1,
+        repeat: 0
+      });
+    }
+
+    // Fila 5: Confused (frames 25-27) + Sad (frames 28-29)
+    if (!this.anims.exists('michi-confused')) {
+      this.anims.create({
+        key: 'michi-confused',
+        frames: this.anims.generateFrameNumbers('michi-spritesheet', { start: 25, end: 27 }),
+        frameRate: 4,
+        repeat: 0
+      });
+    }
+    if (!this.anims.exists('michi-sad')) {
+      this.anims.create({
+        key: 'michi-sad',
+        frames: this.anims.generateFrameNumbers('michi-spritesheet', { start: 28, end: 29 }),
+        frameRate: 3,
+        repeat: -1
+      });
+    }
+
+    // Fila 6: Excited (frames 30-32) + Phone (frames 33-34)
+    if (!this.anims.exists('michi-excited')) {
+      this.anims.create({
+        key: 'michi-excited',
+        frames: this.anims.generateFrameNumbers('michi-spritesheet', { start: 30, end: 32 }),
+        frameRate: 6,
+        repeat: 0
+      });
+    }
+    if (!this.anims.exists('michi-phone')) {
+      this.anims.create({
+        key: 'michi-phone',
+        frames: this.anims.generateFrameNumbers('michi-spritesheet', { start: 33, end: 34 }),
+        frameRate: 3,
+        repeat: -1
+      });
+    }
   }
 
   update(): void {
@@ -254,7 +349,6 @@ export class OfficeScene extends Phaser.Scene {
     body.setVelocity(0);
 
     let moving = false;
-    let direction = 'down';
 
     // Input: teclado o controles móviles
     const mobile = this.mobileControls.isEnabled() ? this.mobileControls.getInput() : null;
@@ -264,17 +358,15 @@ export class OfficeScene extends Phaser.Scene {
     const down = this.cursors.down.isDown || (mobile?.down ?? false);
     const interact = Phaser.Input.Keyboard.JustDown(this.interactKey) || (mobile?.interact ?? false);
 
-    if (left) { body.setVelocityX(-speed); direction = 'left'; moving = true; }
-    else if (right) { body.setVelocityX(speed); direction = 'right'; moving = true; }
-    if (up) { body.setVelocityY(-speed); direction = 'up'; moving = true; }
-    else if (down) { body.setVelocityY(speed); direction = 'down'; moving = true; }
+    if (left) { body.setVelocityX(-speed); moving = true; this.michi.setFlipX(true); }
+    else if (right) { body.setVelocityX(speed); moving = true; this.michi.setFlipX(false); }
+    if (up) { body.setVelocityY(-speed); moving = true; }
+    else if (down) { body.setVelocityY(speed); moving = true; }
 
     if (moving) {
-      this.michi.anims.play(`michi-walk-${direction}`, true);
+      this.michi.anims.play('michi-walk', true);
     } else {
-      const currentAnim = this.michi.anims.currentAnim;
-      const dir = currentAnim ? currentAnim.key.split('-')[2] || 'down' : 'down';
-      this.michi.anims.play(`michi-idle-${dir}`, true);
+      this.michi.anims.play('michi-idle', true);
     }
 
     if (interact) this.checkInteraction();

@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser';
 import { SpriteGenerator } from '../assets/sprite-generator';
+import { loadMichiSpritesheet, createMichiAnimations } from '../assets/michi-sprite-loader';
 
 /**
  * Escena del menú dentro de Phaser.
@@ -22,9 +23,15 @@ export class MenuScene extends Phaser.Scene {
       'assets/sprites/gestos_michigodin.jpeg',
       'assets/sprites/gestos_michigodin.json'
     );
+
+    // Cargar nuevo spritesheet de Michi con animaciones (generado con DALL-E)
+    loadMichiSpritesheet(this);
   }
 
   create(): void {
+    // Crear animaciones de Michi desde el spritesheet
+    createMichiAnimations(this);
+
     const { width, height } = this.cameras.main;
 
     // Fondo oscuro

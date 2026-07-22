@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Verificador de Backend Node/TypeScript",
+      "trigger": "PostFileSave",
+      "description": "Verifica tipos en el backend después de guardar",
+      "matcher": "backend/.*\\.ts$",
+      "action": {
+        "type": "command",
+        "command": "cd code/backend && npx tsc --noEmit --pretty 2>&1 | head -50"
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Verificador de PWA Manifest",
+      "trigger": "PreToolUse",
+      "description": "Verifica que el manifest.json y ngsw-config estén bien configurados",
+      "matcher": "(manifest|ngsw-config).*\\.(json|ts)$",
+      "action": {
+        "type": "agent",
+        "prompt": "Eres un revisor de configuración PWA. Verifica que:\n\n1. **manifest.json**:\n   - name y short_name estén definidos\n   - icons incluyan todos los tamaños necesarios (72, 96, 128, 144, 152, 192, 384, 512)\n   - start_url y scope sean correctos\n   - display mode sea apropiado (standalone para apps)\n   - theme_color y background_color coincidan con el diseño\n\n2. **ngsw-config.json**:\n   - index esté apuntando al archivo correcto\n   - assetGroups incluya todos los recursos necesarios\n   - dataGroups para APIs estén configurados con cache apropiado\n   - URLs críticas estén en el grupo de prefetch\n\n3. **Service Worker**:\n   - Verificar que las estrategias de caché sean apropiadas\n   - Que las rutas de API tengan timeout y cache razonables\n\nSugiere mejoras para que la PWA funcione offline correctamente y cumpla con los estándares de una PWA instalable."
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Verificador de Contenido Educativo Git",
+      "trigger": "PreToolUse",
+      "description": "Verifica que el contenido educativo sobre Git sea preciso y bien estructurado",
+      "matcher": "(minigames|git).*\\.ts$",
+      "action": {
+        "type": "agent",
+        "prompt": "Eres un experto en Git y educación técnica. Revisa el contenido educativo del juego:\n\n1. **Precisión Técnica de Git**:\n   - Los comandos de Git deben ser correctos\n   - Las explicaciones deben ser precisas pero accesibles\n   - Evitar simplificaciones que generen malentendidos\n   - Usar terminología oficial de Git en español\n\n2. **Progresión Pedagógica**:\n   - Empezar con conceptos básicos (init, add, commit)\n   - Graduar complejidad (branches, merge, conflicts)\n   - Cada nivel debe construir sobre el anterior\n   - Incluir ejercicios prácticos\n\n3. **Explicaciones en Español**:\n   - Mantener consistencia en terminología\n   - Explicar conceptos técnicos de forma clara\n   - Usar analogías apropiadas para el contexto mexicano\n   - Ejemplos del mundo real\n\n4. **Retroalimentación Educativa**:\n   - Explicar POR QUÉ un comando es correcto/incorrecto\n   - Sugerir recursos adicionales\n   - Celebrar el aprendizaje, no solo el éxito\n   - Tips contextuales\n\n5. **Casos de Uso Reales**:\n   - Escenarios que reflejen situaciones reales de trabajo\n   - Problemas comunes que enfrentan los desarrolladores\n   - Buenas prácticas de la industria\n\nVerifica que el juego enseñe Git de forma efectiva y divertida para el público mexicano."
+      }
+    }
+  ]
+}

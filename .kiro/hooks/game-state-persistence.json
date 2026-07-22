@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Verificador de Persistencia de Estado",
+      "trigger": "PreToolUse",
+      "description": "Verifica que el estado del juego se guarde correctamente",
+      "matcher": "(state-manager|storage|game-engine).*\\.ts$",
+      "action": {
+        "type": "agent",
+        "prompt": "Eres un experto en persistencia de datos en aplicaciones web. Revisa:\n\n1. **LocalStorage/IndexedDB**:\n   - Guardar progreso del jugador\n   - Guardar configuraciones del juego\n   - Manejar cuota de almacenamiento\n   - Limpiar datos obsoletos\n\n2. **Estructura de Datos**:\n   - Schema claro para el estado del juego\n   - Versionado de datos para migraciones\n   - Compresión si es necesario\n   - Encriptación de datos sensibles\n\n3. **Sincronización**:\n   - Guardado automático en puntos clave\n   - Indicador de guardado al usuario\n   - Manejo de conflictos si hay sync con servidor\n   - Recuperación ante fallos\n\n4. **Estado del Juego a Guardar**:\n   - Nivel actual y progreso\n   - Puntaje y logros\n   - Configuraciones (audio, idioma, etc.)\n   - Estado de minijuegos\n\n5. **Experiencia Offline**:\n   - Funcionalidad completa offline\n   - Sync cuando vuelva la conexión\n   - Indicador de modo offline\n   - No perder datos al cerrar la app\n\nVerifica que el juego Michi Godín guarde y recupere el estado correctamente como una buena PWA."
+      }
+    }
+  ]
+}

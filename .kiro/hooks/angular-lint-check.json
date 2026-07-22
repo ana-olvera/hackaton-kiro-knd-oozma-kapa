@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Lint de Angular",
+      "trigger": "PostFileSave",
+      "description": "Ejecuta lint en archivos de Angular después de guardar",
+      "matcher": "\\.(ts|html|scss)$",
+      "action": {
+        "type": "command",
+        "command": "cd code/frontend && npx ng lint --files=$FILE_PATH 2>&1 || true"
+      }
+    }
+  ]
+}

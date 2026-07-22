@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Verificador de Arquitectura de Componentes Angular",
+      "trigger": "PreToolUse",
+      "description": "Verifica que los componentes Angular sigan buenas prácticas",
+      "matcher": "src/app/.*\\.component\\.ts$",
+      "action": {
+        "type": "agent",
+        "prompt": "Eres un experto en Angular y arquitectura de componentes. Revisa:\n\n1. **Estructura del Componente**:\n   - Un componente = una responsabilidad\n   - Lógica de negocio en servicios, no en componentes\n   - Componentes pequeños y reutilizables\n   - Separar presentación de lógica (smart vs dumb components)\n\n2. **OnPush y Rendimiento**:\n   - Usar ChangeDetectionStrategy.OnPush cuando sea posible\n   - Evitar llamadas a funciones en templates\n   - Usar trackBy en *ngFor\n   - Evitar suscripciones manuales (usar async pipe)\n\n3. **Inputs y Outputs**:\n   - Nombres descriptivos en inglés\n   - Evitar mutar inputs directamente\n   - Usar @Output() para eventos\n   - Documentar inputs/outputs complejos\n\n4. **Servicios y Dependencias**:\n   - Inyección de dependencias via constructor\n   - Servicios con ámbito apropiado (providedIn: 'root')\n   - Evitar lógica duplicada entre componentes\n\n5. **Ciclo de Vida**:\n   - Usar ngOnInit para inicialización, no constructor\n   - Limpiar suscripciones en ngOnDestroy\n   - Evitar lógica compleja en ngOnChanges\n\n6. **Testing**:\n   - Componentes testeables\n   - Mock de servicios en tests\n   - Cobertura de casos edge\n\nSugiere mejoras para que la arquitectura de Angular del juego sea mantenible y escalable."
+      }
+    }
+  ]
+}

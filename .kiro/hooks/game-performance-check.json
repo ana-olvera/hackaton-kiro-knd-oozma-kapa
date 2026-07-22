@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Verificador de Rendimiento del Juego",
+      "trigger": "PreToolUse",
+      "description": "Revisa código del juego para optimizaciones de rendimiento",
+      "matcher": "(game|entities|minigames).*\\.ts$",
+      "action": {
+        "type": "agent",
+        "prompt": "Eres un experto en desarrollo de juegos con TypeScript/Canvas. Revisa el código del juego y verifica:\n\n1. **Rendimiento del Game Loop**:\n   - Usar requestAnimationFrame correctamente\n   - Evitar creación de objetos en el loop principal\n   - Implementar object pooling cuando sea necesario\n   - Limitar cálculos innecesarios\n\n2. **Optimizaciones de Canvas**:\n   - Evitar redraws innecesarios (dirty rectangles)\n   - Usar capas (layers) para elementos estáticos vs dinámicos\n   - Minimizar cambios de estado del contexto\n   - Pre-renderizar elementos estáticos en offscreen canvas\n\n3. **Gestión de Memoria**:\n   - Limpiar event listeners cuando no se usen\n   - Destruir objetos y sprites al cambiar de escena\n   - Evitar memory leaks en animaciones\n\n4. **Minijuegos**:\n   - Verificar que cada minijuego tenga cleanup apropiado\n   - Que la transición entre escenas sea suave\n   - Implementar pausa cuando el juego no esté activo\n\n5. **Movilidad/PWA**:\n   - Optimizar para dispositivos móviles\n   - Manejar eventos touch correctamente\n   - Considerar batería y rendimiento en móviles\n\nSugiere optimizaciones específicas para que el juego Michi Godín funcione fluidamente en dispositivos móviles como PWA."
+      }
+    }
+  ]
+}

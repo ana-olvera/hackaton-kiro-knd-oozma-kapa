@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Verificador de TypeScript Estricto",
+      "trigger": "PostFileSave",
+      "description": "Verifica que el código TypeScript cumpla con tipado estricto y buenas prácticas",
+      "matcher": "\\.(ts|tsx)$",
+      "action": {
+        "type": "command",
+        "command": "cd code/frontend && npx tsc --noEmit --pretty 2>&1 | head -50"
+      }
+    }
+  ]
+}

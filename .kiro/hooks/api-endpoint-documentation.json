@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Verificador de Documentación de API",
+      "trigger": "PreToolUse",
+      "description": "Verifica que los endpoints del backend estén bien documentados",
+      "matcher": "backend/src/modules/.*\\.(routes|controller)\\.ts$",
+      "action": {
+        "type": "agent",
+        "prompt": "Eres un experto en desarrollo de APIs REST. Revisa los endpoints del backend:\n\n1. **Documentación de Endpoints**:\n   - Cada endpoint debe tener descripción clara en español\n   - Documentar parámetros de entrada y sus tipos\n   - Documentar respuestas esperadas y códigos HTTP\n   - Ejemplos de uso\n\n2. **Buenas Prácticas REST**:\n   - Usar verbos HTTP correctos (GET, POST, PUT, DELETE)\n   - Nombres de recursos en plural (/users, /games)\n   - Códigos de estado HTTP apropiados\n   - Manejo consistente de errores\n\n3. **Validación de Datos**:\n   - Validar todos los inputs del usuario\n   - Mensajes de error claros en español\n   - Sanitización de datos\n   - Rate limiting donde aplique\n\n4. **Seguridad**:\n   - Autenticación donde sea necesario\n   - Autorización por roles\n   - No exponer información sensible\n   - Logs de acciones críticas\n\n5. **Estructura de Respuesta**:\n   - Formato consistente de respuesta\n   - Incluir metadata cuando sea útil (paginación, total)\n   - Errores con estructura definida\n   - Versionado de API si es necesario\n\nSugiere mejoras para que la API del juego sea robusta, segura y fácil de usar."
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Verificador de Accesibilidad",
+      "trigger": "PreToolUse",
+      "description": "Revisa que el juego sea accesible para todos los usuarios",
+      "matcher": "\\.(component|scene)\\.ts$",
+      "action": {
+        "type": "agent",
+        "prompt": "Eres un experto en accesibilidad web. Revisa que el juego Michi Godín sea accesible:\n\n1. **Navegación por Teclado**:\n   - Todos los elementos interactivos accesibles con Tab\n   - Indicadores visuales de foco claros\n   - Atajos de teclado documentados\n   - Skip links para navegación rápida\n\n2. **Lectores de Pantalla**:\n   - aria-labels en elementos interactivos\n   - aria-live para cambios dinámicos (puntaje, nivel)\n   - Descripciones de acciones del juego\n   - Anuncios de eventos importantes\n\n3. **Elementos Visuales**:\n   - Contraste de colores mínimo 4.5:1 para texto\n   - No depender solo del color para transmitir información\n   - Tamaños de click/touch mínimo 44x44px\n   - Animaciones que pueden desactivarse\n\n4. **Estructura Semántica**:\n   - Uso correcto de headings (h1, h2, h3)\n   - Landmarks ARIA apropiados\n   - Roles semánticos (button, navigation, main)\n\n5. **Experiencia de Usuario**:\n   - Instrucciones claras antes de cada minijuego\n   - Feedback visual y sonoro de acciones\n   - Opción de pausar el juego\n   - Tiempo razonable para completar acciones\n\nSugiere mejoras específicas para que el juego educativo de Git sea accesible para usuarios con diferentes capacidades."
+      }
+    }
+  ]
+}

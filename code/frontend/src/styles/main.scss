@@ -13,10 +13,70 @@ html, body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #1a1a2e;
   color: #ffffff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* Usar viewport dinámico en móviles */
+@supports (height: 100dvh) {
+  html, body {
+    height: 100dvh;
+  }
 }
 
 /* Prevenir selección de texto durante el juego */
 canvas {
   user-select: none;
   -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
 }
+
+/* Asegurar que app-root ocupe toda la pantalla */
+app-root {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+/* Optimizaciones específicas para móviles */
+@media (max-width: 768px) {
+  html, body, app-root {
+    height: 100dvh !important;
+    max-height: -webkit-fill-available;
+  }
+  
+  /* Prevenir zoom en inputs (si los hay) */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
+
+/* Prevenir comportamientos no deseados en iOS */
+body {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+/* Ocultar scrollbars pero mantener funcionalidad de scroll si es necesario */
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+

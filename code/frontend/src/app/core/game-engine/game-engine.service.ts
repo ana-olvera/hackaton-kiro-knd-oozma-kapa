@@ -21,10 +21,21 @@ export class GameEngineService {
       return;
     }
 
+    // Detectar si es móvil
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    // Obtener dimensiones reales de la pantalla
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    
+    // Para móviles, usar dimensiones de la pantalla real
+    const gameWidth = isMobile ? Math.min(width, 800) : 800;
+    const gameHeight = isMobile ? Math.min(height, 600) : 600;
+
     const config: Phaser.Types.Core.GameConfig = {
       type: Phaser.AUTO,
-      width: 800,
-      height: 600,
+      width: gameWidth,
+      height: gameHeight,
       parent: parent,
       pixelArt: true,
       physics: {
@@ -46,10 +57,10 @@ export class GameEngineService {
         BossScene
       ],
       scale: {
-        mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.RESIZE,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: 800,
-        height: 600,
+        width: gameWidth,
+        height: gameHeight,
         // Responsive: ajusta el tamaño en dispositivos pequeños
         min: {
           width: 320,
@@ -67,10 +78,33 @@ export class GameEngineService {
         pixelArt: true,
         antialias: false,
         roundPixels: true
-      }
+      },
+      // Forzar uso completo del canvas
+      backgroundColor: '#1a1a2e'
     };
 
     this.game = new Phaser.Game(config);
+    
+    // Listener para redimensionar cuando cambia la orientación
+    if (isMobile) {
+      window.addEventListener('resize', () => {
+        if (this.game) {
+          const newWidth = window.innerWidth;
+          const newHeight = window.innerHeight;
+          this.game.scale.resize(newWidth, newHeight);
+        }
+      });
+      
+      window.addEventListener('orientationchange', () => {
+        setTimeout(() => {
+          if (this.game) {
+            const newWidth = window.innerWidth;
+            const newHeight = window.innerHeight;
+            this.game.scale.resize(newWidth, newHeight);
+          }
+        }, 100);
+      });
+    }
   }
 
   destroy(): void {

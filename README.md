@@ -2,7 +2,7 @@
 
 Un videojuego PWA que simula de manera humorística la vida de un desarrollador en una jornada laboral típica. Aprende Git mientras sobrevives a reuniones, bugs, y la infatigable Karen.
 
-> 🚀 **¿Primera vez desplegando?** Lee: [LEEME_PRIMERO.md](./LEEME_PRIMERO.md)
+> 🚀 **¿Primera vez desplegando?** Lee: [docs/despliegue/LEEME_PRIMERO.md](./docs/despliegue/LEEME_PRIMERO.md)
 
 ## Estructura del Proyecto
 
@@ -39,10 +39,10 @@ Este proyecto está configurado para desplegarse automáticamente en GitHub Page
 
 | Documento | Descripción |
 |-----------|-------------|
-| [🚀 Quick Start](./QUICK_START.md) | Despliega en 5 minutos |
-| [✅ Checklist](./CHECKLIST_DEPLOY.md) | Verificación paso a paso |
-| [📘 Guía Completa](./DEPLOY.md) | Documentación detallada |
-| [📦 Resumen](./DEPLOY_SUMMARY.md) | Arquitectura y configuración |
+| [🚀 Quick Start](./docs/despliegue/QUICK_START.md) | Despliega en 5 minutos |
+| [✅ Checklist](./docs/despliegue/CHECKLIST_DEPLOY.md) | Verificación paso a paso |
+| [📘 Guía Completa](./docs/despliegue/DEPLOY.md) | Documentación detallada |
+| [📦 Resumen](./docs/despliegue/DEPLOY_SUMMARY.md) | Arquitectura y configuración |
 
 ### ⚡ Despliegue Rápido
 
@@ -124,12 +124,26 @@ cp code/backend/.env.example code/backend/.env
 
 La carpeta `docs/` contiene toda la documentación del proyecto:
 
-- **01-game-design.md** - Diseño del juego, mecánicas y recursos
-- **02-personajes.md** - Personajes, enemigos y jefes
-- **03-niveles-y-minijuegos.md** - Sistema de progresión y detalle de niveles
-- **04-arquitectura.md** - Arquitectura técnica y decisiones de diseño
-- **05-certificados.md** - Sistema de certificados y verificación
-- **06-fases-desarrollo.md** - Roadmap y fases de desarrollo
+### 📖 Índice de Documentación
+
+**👉 [Ver documentación completa en docs/](./docs/README.md)**
+
+#### Despliegue
+- [🚀 Quick Start](./docs/despliegue/QUICK_START.md) - Despliega en 5 minutos
+- [🎯 Primera Vez](./docs/despliegue/PRIMERA_VEZ.md) - Guía paso a paso
+- [📘 Guía Completa](./docs/despliegue/DEPLOY.md) - Documentación detallada
+
+#### Diseño del Juego
+- [Game Design](./docs/01-game-design.md) - Diseño del juego, mecánicas y recursos
+- [Personajes](./docs/02-personajes.md) - Personajes, enemigos y jefes
+- [Niveles y Minijuegos](./docs/03-niveles-y-minijuegos.md) - Sistema de progresión
+- [Arquitectura](./docs/04-arquitectura.md) - Arquitectura técnica
+- [Certificados](./docs/05-certificados.md) - Sistema de certificados
+- [Fases de Desarrollo](./docs/06-fases-desarrollo.md) - Roadmap del proyecto
+
+#### Optimizaciones Móviles
+- [📱 Mejoras Móvil](./docs/mobile/MEJORAS_MOVIL.md) - Controles táctiles y optimizaciones
+- [🔧 Pantalla Completa](./docs/mobile/FIX_PANTALLA_COMPLETA.md) - Fix de letterboxing
 
 ## Contribuir
 

@@ -35,18 +35,20 @@ export class MobileControls {
     this.container = this.scene.add.container(0, 0);
     this.container.setScrollFactor(0);
     this.container.setDepth(5000);
-    this.container.setAlpha(0.6);
+    this.container.setAlpha(0.7);
 
-    const { height } = this.scene.cameras.main;
+    const { width, height } = this.scene.cameras.main;
 
-    // D-pad (esquina inferior izquierda)
-    const dpadX = 90;
-    const dpadY = height - 100;
-    const btnSize = 28;
-    const spacing = 38;
+    // D-pad (esquina inferior izquierda) - Ajustado para diferentes tamaños
+    const isMobile = width < 600;
+    const dpadX = isMobile ? 80 : 90;
+    const dpadY = height - (isMobile ? 90 : 100);
+    const btnSize = isMobile ? 35 : 28;
+    const spacing = isMobile ? 48 : 38;
 
     // Fondo del D-pad
-    const dpadBg = this.scene.add.circle(dpadX, dpadY, 60, 0x000000, 0.3);
+    const bgSize = isMobile ? 70 : 60;
+    const dpadBg = this.scene.add.circle(dpadX, dpadY, bgSize, 0x000000, 0.4);
     this.container.add(dpadBg);
 
     // Up
@@ -59,19 +61,23 @@ export class MobileControls {
     this.createDpadButton('right', dpadX + spacing, dpadY, btnSize);
 
     // Botón de interacción (esquina inferior derecha)
-    const interactX = 710;
-    const interactY = height - 100;
+    const interactX = width - (isMobile ? 80 : 90);
+    const interactY = height - (isMobile ? 90 : 100);
+    const interactSize = isMobile ? 45 : 40;
+    const interactBtnSize = isMobile ? 40 : 32;
 
-    const interactBg = this.scene.add.circle(interactX, interactY, 40, 0x000000, 0.3);
+    const interactBg = this.scene.add.circle(interactX, interactY, interactSize, 0x000000, 0.4);
     this.container.add(interactBg);
 
-    this.interactBtn = this.scene.add.circle(interactX, interactY, 32, 0x00AA55);
-    this.interactBtn.setStrokeStyle(3, 0x00FF88);
+    this.interactBtn = this.scene.add.circle(interactX, interactY, interactBtnSize, 0x00AA55);
+    this.interactBtn.setStrokeStyle(4, 0x00FF88);
     this.interactBtn.setInteractive();
     this.container.add(this.interactBtn);
 
     const eText = this.scene.add.text(interactX, interactY, 'E', {
-      fontSize: '18px', color: '#FFFFFF', fontStyle: 'bold'
+      fontSize: isMobile ? '22px' : '18px', 
+      color: '#FFFFFF', 
+      fontStyle: 'bold'
     }).setOrigin(0.5);
     this.container.add(eText);
 
@@ -89,10 +95,11 @@ export class MobileControls {
     });
 
     // Labels
+    const labelSize = isMobile ? '18px' : '14px';
     const arrows = { up: '▲', down: '▼', left: '◀', right: '▶' };
     this.dpadButtons.forEach((btn, dir) => {
       const label = this.scene.add.text(btn.x, btn.y, arrows[dir as keyof typeof arrows], {
-        fontSize: '14px', color: '#FFFFFF'
+        fontSize: labelSize, color: '#FFFFFF'
       }).setOrigin(0.5);
       this.container.add(label);
     });

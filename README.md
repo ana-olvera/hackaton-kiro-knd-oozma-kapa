@@ -2,6 +2,8 @@
 
 Un videojuego PWA que simula de manera humorística la vida de un desarrollador en una jornada laboral típica. Aprende Git mientras sobrevives a reuniones, bugs, y la infatigable Karen.
 
+> 🚀 **¿Primera vez desplegando?** Lee: [LEEME_PRIMERO.md](./LEEME_PRIMERO.md)
+
 ## Estructura del Proyecto
 
 ```
@@ -27,6 +29,33 @@ hackaton-kiro-knd-oozma-kapa/
 - **npm** >= 9.x
 - **Angular CLI** >= 17.x (`npm install -g @angular/cli`)
 
+## 🚀 Despliegue en GitHub Pages
+
+Este proyecto está configurado para desplegarse automáticamente en GitHub Pages.
+
+**URL en producción:** https://ana-olvera.github.io/hackaton-kiro-knd-oozma-kapa/
+
+### 📖 Documentación de Despliegue
+
+| Documento | Descripción |
+|-----------|-------------|
+| [🚀 Quick Start](./QUICK_START.md) | Despliega en 5 minutos |
+| [✅ Checklist](./CHECKLIST_DEPLOY.md) | Verificación paso a paso |
+| [📘 Guía Completa](./DEPLOY.md) | Documentación detallada |
+| [📦 Resumen](./DEPLOY_SUMMARY.md) | Arquitectura y configuración |
+
+### ⚡ Despliegue Rápido
+
+```bash
+# Opción 1: Script automático (recomendado)
+./scripts/quick-deploy.sh
+
+# Opción 2: Manual
+git add .
+git commit -m "chore: deploy"
+git push origin main
+```
+
 ## Arranque Rápido
 
 ### Frontend (PWA)
@@ -39,7 +68,9 @@ ng serve
 
 La aplicación estará disponible en `http://localhost:4200`.
 
-### Backend (API)
+### Backend (API) - Fase 2
+
+> ⚠️ **Nota:** El backend no está desplegado en Fase 1. La PWA funciona completamente offline.
 
 ```bash
 cd code/backend

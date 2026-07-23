@@ -15,7 +15,7 @@ export class MenuScene extends Phaser.Scene {
     SpriteGenerator.generateAll(this);
 
     // Cargar splash art isométrico
-    this.load.image('michi-splash', 'assets/sprites/MichigodinMain.jpeg');
+    this.load.image('michi-splash', 'assets/sprites/michi_godin_main.png');
 
     // Cargar atlas de emociones (para que esté en cache cuando inicie OfficeScene)
     this.load.atlas(

@@ -2,9 +2,12 @@ import * as Phaser from 'phaser';
 import { SpriteGenerator } from '../assets/sprite-generator';
 import { loadMichiSpritesheet, createMichiAnimations, MichiSprite, MichiState } from '../assets/michi-sprite-loader';
 import { loadKarenSpritesheet, createKarenAnimations } from '../assets/karen-sprite-loader';
+import { loadBecatinSpritesheet, createBecatinAnimations } from '../assets/becatin-sprite-loader';
 import { KarenSystem, KarenMessage } from '../systems/karen-system';
 import { KarenNpc } from '../systems/karen-npc';
 import { KarenMessageBubble } from '../systems/karen-message-bubble';
+import { BecatinNpc } from '../systems/becatin-npc';
+import { BecatinEventsSystem, BecatinEvent } from '../systems/becatin-events-system';
 import { TimeSystem } from '../systems/time-system';
 import { HudSystem } from '../systems/hud-system';
 import { PortraitSystem } from '../systems/portrait-system';
@@ -38,6 +41,10 @@ export class OfficeScene extends Phaser.Scene {
   private karenNpc!: KarenNpc;
   private karenMessageBubble!: KarenMessageBubble;
 
+  // Sistemas de Becatín NPC
+  private becatinNpc!: BecatinNpc;
+  private becatinEventsSystem!: BecatinEventsSystem;
+
   // Sistemas Fase 2
   private npcSystem!: NpcSystem;
   private eventsSystem!: EventsSystem;
@@ -63,6 +70,19 @@ export class OfficeScene extends Phaser.Scene {
     startTime: 0
   };
 
+  // Constantes para el escritorio de Becatín
+  private static readonly BECATIN_DESK = {
+    ROW: 5,
+    COL_DESK: 20,
+    COL_COFFEE: 21,
+    COL_COMPUTER: 22,
+    // Coordenadas en píxeles (col * tileSize + tileSize/2, row * tileSize + tileSize/2)
+    DESK_X: 20 * 32 + 16,    // 656px
+    DESK_Y: 5 * 32 + 16,     // 176px
+    COMPUTER_X: 22 * 32 + 16, // 720px
+    COMPUTER_Y: 5 * 32 + 16   // 176px
+  };
+
   // Tracking para logros
   private karenometerMax = 0;
   private energyMin = 100;
@@ -72,13 +92,15 @@ export class OfficeScene extends Phaser.Scene {
   // Minijuegos disponibles según nivel
   private availableMinigames: string[] = ['GitBasicScene'];
 
+  // Mapa de la oficina: 0=piso, 1=pared, 2=escritorio, 3=computadora, 4=café, 5=silla
+  // Escritorio de Becatín designado en posición (20, 5): tiles 2, 4, 3 (escritorio + café + computadora)
   private officeMap: number[][] = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 2, 3, 0, 5, 0, 0, 2, 3, 0, 5, 0, 0, 2, 3, 0, 5, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 2, 3, 0, 5, 0, 0, 2, 3, 0, 5, 0, 0, 2, 3, 0, 5, 0, 0, 0, 4, 0, 0, 1],
+    [1, 0, 2, 3, 0, 5, 0, 0, 2, 3, 0, 5, 0, 0, 2, 3, 0, 5, 0, 0, 2, 4, 3, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 2, 3, 0, 5, 0, 0, 2, 3, 0, 5, 0, 0, 2, 3, 0, 5, 0, 0, 0, 0, 0, 0, 1],
@@ -130,6 +152,10 @@ export class OfficeScene extends Phaser.Scene {
     // Cargar spritesheet de Karen para el NPC
     console.log('[OfficeScene] Cargando spritesheet de Karen');
     loadKarenSpritesheet(this);
+    
+    // Cargar spritesheet de Becatín para el NPC
+    console.log('[OfficeScene] Cargando spritesheet de Becatín');
+    loadBecatinSpritesheet(this);
     
     // Cargar sprite de Michi News para el sistema de diálogos
     console.log('[OfficeScene] Cargando sprite de Michi News');
@@ -189,12 +215,29 @@ export class OfficeScene extends Phaser.Scene {
     // Crear animaciones de Karen
     createKarenAnimations(this);
 
+    // Crear animaciones de Becatín
+    createBecatinAnimations(this);
+
     // Crear Karen NPC (posición en esquina de la oficina, alejada de Michi)
     console.log('[OfficeScene] Creando Karen NPC');
     this.karenNpc = new KarenNpc(this, 18 * tileSize, 4 * tileSize, this.walls, this.michi);
     
     // Crear sistema de globos de mensaje de Karen
     this.karenMessageBubble = new KarenMessageBubble(this);
+
+    // Crear Becatín NPC en su escritorio designado
+    console.log('[OfficeScene] Creando Becatín NPC');
+    const becatinDesk = this.getBecatinDeskCoordinates();
+    this.becatinNpc = new BecatinNpc(
+      this, 
+      becatinDesk.deskX, 
+      becatinDesk.deskY, 
+      this.walls, 
+      this.michi
+    );
+
+    // Crear sistema de eventos de Becatín
+    this.becatinEventsSystem = new BecatinEventsSystem(this);
 
     // Controles teclado
     this.cursors = this.input.keyboard!.createCursorKeys();
@@ -227,6 +270,15 @@ export class OfficeScene extends Phaser.Scene {
 
     // Configurar Karen NPC con nivel inicial
     this.karenNpc.updateKarenLevel(this.gameState.karenometer);
+
+    // Configurar callback para eventos de Becatín
+    this.becatinEventsSystem.setEventCallback((event: BecatinEvent) => this.handleBecatinEvent(event));
+    
+    // Configurar callback para acciones de Becatín NPC
+    this.becatinNpc.setActionCallback((effects: any, message: string) => {
+      // Generar evento aleatorio basado en el mensaje
+      this.becatinEventsSystem.generateRandomEvent();
+    });
 
     // === SISTEMAS FASE 2 ===
     this.audioSystem = new AudioSystem();
@@ -435,6 +487,9 @@ export class OfficeScene extends Phaser.Scene {
     
     // Actualizar globo de mensaje de Karen
     this.karenMessageBubble.update();
+
+    // Actualizar Becatín NPC
+    this.becatinNpc.update(this.time.now, this.game.loop.delta);
 
     // Tracking estrés bajo para logro zen
     if (this.gameState.stress < 20) {
@@ -660,6 +715,62 @@ export class OfficeScene extends Phaser.Scene {
     this.updateHud();
   }
 
+  /**
+   * Maneja los eventos generados por Becatín
+   */
+  private handleBecatinEvent(event: BecatinEvent): void {
+    // Aplicar efectos a las estadísticas
+    if (event.effects.stress !== undefined) {
+      this.gameState.stress = Math.max(0, Math.min(100, this.gameState.stress + event.effects.stress));
+    }
+    if (event.effects.energy !== undefined) {
+      this.gameState.energy = Math.max(0, Math.min(100, this.gameState.energy + event.effects.energy));
+    }
+    if (event.effects.focus !== undefined) {
+      this.gameState.focus = Math.max(0, Math.min(100, this.gameState.focus + event.effects.focus));
+    }
+    if (event.effects.happiness !== undefined) {
+      this.gameState.happiness = Math.max(0, Math.min(100, this.gameState.happiness + event.effects.happiness));
+    }
+    if (event.effects.karenometer !== undefined) {
+      this.gameState.karenometer = Math.max(0, Math.min(100, this.gameState.karenometer + event.effects.karenometer));
+      this.karenNpc.updateKarenLevel(this.gameState.karenometer);
+    }
+
+    // Mostrar alerta como solicitó el usuario
+    alert(`${event.title}\n\n${event.message}`);
+
+    // También mostrar notificación en HUD
+    this.hudSystem.showNotification({
+      title: `Becatín: ${event.title}`,
+      text: event.message,
+      color: event.isPositive ? '#00FF88' : '#FF6B6B',
+      icon: event.isPositive ? '😸' : '🙀',
+      position: 'bottom-center',
+      duration: 4000
+    });
+
+    // Efectos audiovisuales
+    if (event.isPositive) {
+      this.audioSystem.playSuccess();
+      this.portraitSystem.setTemporaryEmotion('happy', 3000);
+    } else {
+      this.audioSystem.playError();
+      if (event.priority === 'high') {
+        this.portraitSystem.setTemporaryEmotion('scared', 4000);
+      } else {
+        this.portraitSystem.setTemporaryEmotion('surprised', 2000);
+      }
+    }
+
+    this.updateHud();
+
+    // Verificar game over por estrés
+    if (this.gameState.stress >= 100) {
+      this.handleGameOver('estrés');
+    }
+  }
+
   private handleHourChange(hour: number): void {
     if (hour === 10) {
       this.dialogueSystem.play('daily-standup');
@@ -682,6 +793,7 @@ export class OfficeScene extends Phaser.Scene {
     this.karenSystem.stop();
     this.karenNpc.destroy();
     this.karenMessageBubble.forceCleanup();
+    this.becatinNpc.destroy();
     this.npcSystem.stop();
     this.eventsSystem.stop();
     this.degradeTimer.destroy();
@@ -715,6 +827,7 @@ export class OfficeScene extends Phaser.Scene {
     this.karenSystem.stop();
     this.karenNpc.destroy();
     this.karenMessageBubble.forceCleanup();
+    this.becatinNpc.destroy();
     this.npcSystem.stop();
     this.eventsSystem.stop();
     this.timeSystem.stop();
@@ -775,5 +888,18 @@ export class OfficeScene extends Phaser.Scene {
       'git-conflict': 'GitConflictScene',
     };
     return minigameIds.map(id => map[id]).filter(Boolean);
+  }
+
+  /**
+   * Obtiene las coordenadas del escritorio designado para Becatín
+   * Usado por el sistema BecatinNpc para saber dónde debe sentarse
+   */
+  getBecatinDeskCoordinates(): { deskX: number; deskY: number; computerX: number; computerY: number } {
+    return {
+      deskX: OfficeScene.BECATIN_DESK.DESK_X,
+      deskY: OfficeScene.BECATIN_DESK.DESK_Y,
+      computerX: OfficeScene.BECATIN_DESK.COMPUTER_X,
+      computerY: OfficeScene.BECATIN_DESK.COMPUTER_Y
+    };
   }
 }

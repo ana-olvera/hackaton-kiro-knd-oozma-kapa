@@ -3,6 +3,8 @@ import * as Phaser from 'phaser';
 /**
  * Sistema de NPCs (personajes secundarios).
  * Michi QA, Becatín y Michi News aparecen periódicamente y ofrecen interacciones.
+ * 
+ * Michi News es especial: requiere decisión del jugador (ignorar o escuchar chisme).
  */
 
 export interface NpcDialogue {
@@ -21,6 +23,7 @@ export interface NpcConfig {
   color: string;
   icon: string;
   dialogues: NpcDialogue[];
+  requiresChoice?: boolean; // True para NPCs que necesitan decisión del jugador
 }
 
 const NPC_CONFIGS: NpcConfig[] = [
@@ -59,6 +62,9 @@ const NPC_CONFIGS: NpcConfig[] = [
     name: 'Michi News',
     color: '#CC66FF',
     icon: '🐱📰',
+    requiresChoice: true, // Este NPC requiere decisión del jugador
+    // Los diálogos de Michi News ahora se manejan en ChoiceDialogSystem
+    // pero mantenemos estos como fallback
     dialogues: [
       { text: '"Dicen que RH anda buscando..."', effect: { type: 'stress', value: 5 } },
       { text: '"¿Ya viste quién renunció?"', effect: { type: 'focus', value: -10 } },
@@ -77,14 +83,21 @@ export class NpcSystem {
   private npcContainer: Phaser.GameObjects.Container | null = null;
   private timer: Phaser.Time.TimerEvent | null = null;
   private onEffectCallback: ((effect: NpcEffect, npcId: string) => void) | null = null;
+  private onChoiceNpcCallback: (() => void) | null = null; // Callback para NPCs con elección
   private cooldown = false;
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
   }
 
-  start(onEffect: (effect: NpcEffect, npcId: string) => void): void {
+  /**
+   * Inicia el sistema de NPCs.
+   * @param onEffect Callback para NPCs que auto-aplican efectos (Michi QA, Becatín)
+   * @param onChoiceNpc Callback para NPCs que requieren decisión (Michi News)
+   */
+  start(onEffect: (effect: NpcEffect, npcId: string) => void, onChoiceNpc?: () => void): void {
     this.onEffectCallback = onEffect;
+    this.onChoiceNpcCallback = onChoiceNpc || null;
     this.scheduleNext();
   }
 
@@ -93,6 +106,15 @@ export class NpcSystem {
       this.timer.destroy();
       this.timer = null;
     }
+  }
+
+  /**
+   * Libera el cooldown después de que un diálogo con elección termina.
+   * Debe llamarse desde OfficeScene cuando el jugador hace su elección.
+   */
+  releaseCooldown(): void {
+    this.cooldown = false;
+    this.activeNpc = null;
   }
 
   private scheduleNext(): void {
@@ -108,9 +130,17 @@ export class NpcSystem {
 
   private spawnRandomNpc(): void {
     const npc = NPC_CONFIGS[Math.floor(Math.random() * NPC_CONFIGS.length)];
-    const dialogue = npc.dialogues[Math.floor(Math.random() * npc.dialogues.length)];
     this.activeNpc = npc;
 
+    // Si el NPC requiere elección (Michi News), usar callback especial
+    if (npc.requiresChoice && this.onChoiceNpcCallback) {
+      this.cooldown = true;
+      this.onChoiceNpcCallback();
+      return;
+    }
+
+    // Para NPCs normales, mostrar diálogo y auto-aplicar efecto
+    const dialogue = npc.dialogues[Math.floor(Math.random() * npc.dialogues.length)];
     this.showNpcDialogue(npc, dialogue);
   }
 

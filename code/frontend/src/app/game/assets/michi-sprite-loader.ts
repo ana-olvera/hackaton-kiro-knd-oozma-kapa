@@ -1,20 +1,25 @@
 import * as Phaser from 'phaser';
 
 /**
- * Configuración del spritesheet de Michi Godín generado con DALL-E
+ * Configuración del spritesheet de Michi Godín
  * 
- * El spritesheet tiene 5 columnas x 7 filas
- * Cada celda es de 128x128 píxeles
- * Tamaño total: 640x896 píxeles
+ * ESPECIFICACIONES TÉCNICAS:
+ * - Dimensiones totales: 1024 x 2048 píxeles
+ * - Grid: 4 columnas x 8 filas (32 celdas)
+ * - Tamaño de cada celda: 256 x 256 píxeles
+ * - Origen: Esquina superior izquierda (0,0)
+ * - Filter Mode: Point (No Filter) / Nearest Neighbor
+ * - Compression: None (RGBA 32-bit)
  */
 
-// Dimensiones del spritesheet según la imagen real de DALL-E
-// Imagen: 1024 x 1536 píxeles, 5 columnas x 7 filas
+// Configuración exacta según especificaciones de la IA
 const SPRITE_CONFIG = {
-  frameWidth: 204,   // 1024 / 5 = 204.8, redondeamos a 204
-  frameHeight: 219,  // 1536 / 7 = 219.4, redondeamos a 219
-  columns: 5,        // Columnas en el spritesheet
-  rows: 7            // Filas en el spritesheet
+  frameWidth: 256,   // Ancho exacto de cada celda
+  frameHeight: 256,  // Alto exacto de cada celda
+  columns: 4,        // Columnas en el spritesheet
+  rows: 8,           // Filas en el spritesheet
+  spacing: 0,        // Sin espacio entre frames
+  margin: 0          // Sin margen inicial
 };
 
 /**
@@ -30,45 +35,52 @@ export interface MichiAnimation {
 
 /**
  * Todas las animaciones disponibles para Michi
- * Basadas en el layout del spritesheet:
  * 
- * Fila 0 (frames 0-4):   Idle - parado con maletín
- * Fila 1 (frames 5-9):   Walk - caminando
- * Fila 2 (frames 10-14): Sleep - durmiendo con ZZZ (último frame vacío)
- * Fila 3 (frames 15-19): Work (15-16) + Coffee (17-19)
- * Fila 4 (frames 20-24): Stressed (20-23) + Celebrate (24)
- * Fila 5 (frames 25-29): Confused (25-27) + Sad (28-29)
- * Fila 6 (frames 30-34): Excited (30-32) + Phone (33-34)
+ * MAPA DE ANIMACIONES (según especificaciones):
+ * - Row 1 (0-3):   Idle/Reposo - 4 frames [6-8 FPS]
+ * - Row 2 (4-7):   Walking/Caminar - 4 frames [8-10 FPS]
+ * - Row 3 (8-10):  Sleeping/Dormir - 3 frames [4 FPS] (celda 11 vacía)
+ * - Row 4 (12-13): Action A/Trabajo - 2 frames [6 FPS]
+ * - Row 4 (14-15): Action B/Beber - 2 frames [4 FPS]
+ * - Row 5 (16-19): Reaction 1/Estresado - 4 frames [8 FPS]
+ * - Row 6 (20-21): Reaction 2/Confundido - 2 frames [4 FPS]
+ * - Row 6 (22-23): Reaction 3/Triste - 2 frames [6 FPS]
+ * - Row 7 (24-25): Surprise/Emocionado - 2 frames [6 FPS]
+ * - Row 7 (26-27): Joy/Celebrar - 2 frames [6 FPS]
+ * - Row 8 (28-29): Wave/Teléfono - 2 frames [4 FPS] (celdas 30-31 vacías)
  */
 export const MICHI_ANIMATIONS: MichiAnimation[] = [
-  // Fila 0: Idle/Parado con maletín (5 frames)
-  { key: 'michi-idle', startFrame: 0, endFrame: 4, frameRate: 4, repeat: -1 },
+  // Row 1: Idle (4 frames) - Loop
+  { key: 'michi-idle', startFrame: 0, endFrame: 3, frameRate: 6, repeat: -1 },
   
-  // Fila 1: Caminando (5 frames)
-  { key: 'michi-walk', startFrame: 5, endFrame: 9, frameRate: 8, repeat: -1 },
+  // Row 2: Walk (4 frames) - Loop
+  { key: 'michi-walk', startFrame: 4, endFrame: 7, frameRate: 8, repeat: -1 },
   
-  // Fila 2: Durmiendo con ZZZ (4 frames)
-  { key: 'michi-sleep', startFrame: 10, endFrame: 13, frameRate: 2, repeat: -1 },
+  // Row 3: Sleep (3 frames) - Loop
+  { key: 'michi-sleep', startFrame: 8, endFrame: 10, frameRate: 4, repeat: -1 },
   
-  // Fila 3: Trabajando en laptop (2 frames) + Tomando café (3 frames)
-  { key: 'michi-work', startFrame: 15, endFrame: 16, frameRate: 4, repeat: -1 },
-  { key: 'michi-coffee', startFrame: 17, endFrame: 19, frameRate: 3, repeat: -1 },
+  // Row 4: Work (2 frames) + Coffee (2 frames) - Loop
+  { key: 'michi-work', startFrame: 12, endFrame: 13, frameRate: 6, repeat: -1 },
+  { key: 'michi-coffee', startFrame: 14, endFrame: 15, frameRate: 4, repeat: -1 },
   
-  // Fila 4: Estresado (4 frames) + Celebrando (1 frame)
-  { key: 'michi-stressed', startFrame: 20, endFrame: 23, frameRate: 6, repeat: -1 },
-  { key: 'michi-celebrate', startFrame: 24, endFrame: 24, frameRate: 1, repeat: 0 },
+  // Row 5: Stressed (4 frames) - Loop
+  { key: 'michi-stressed', startFrame: 16, endFrame: 19, frameRate: 8, repeat: -1 },
   
-  // Fila 5: Confundido (3 frames) + Triste (2 frames)
-  { key: 'michi-confused', startFrame: 25, endFrame: 27, frameRate: 4, repeat: 0 },
-  { key: 'michi-sad', startFrame: 28, endFrame: 29, frameRate: 3, repeat: -1 },
+  // Row 6: Confused (2 frames) + Sad (2 frames) - Play Once
+  { key: 'michi-confused', startFrame: 20, endFrame: 21, frameRate: 4, repeat: 0 },
+  { key: 'michi-sad', startFrame: 22, endFrame: 23, frameRate: 6, repeat: -1 },
   
-  // Fila 6: Emocionado (3 frames) + Usando teléfono (2 frames)
-  { key: 'michi-excited', startFrame: 30, endFrame: 32, frameRate: 6, repeat: 0 },
-  { key: 'michi-phone', startFrame: 33, endFrame: 34, frameRate: 3, repeat: -1 }
+  // Row 7: Excited (2 frames) + Celebrate (2 frames) - Play Once
+  { key: 'michi-excited', startFrame: 24, endFrame: 25, frameRate: 6, repeat: 0 },
+  { key: 'michi-celebrate', startFrame: 26, endFrame: 27, frameRate: 6, repeat: 0 },
+  
+  // Row 8: Phone (2 frames) - Loop
+  { key: 'michi-phone', startFrame: 28, endFrame: 29, frameRate: 4, repeat: -1 }
 ];
 
 /**
  * Carga el spritesheet de Michi en una escena de Phaser
+ * Aplica filtro NEAREST para evitar pixel bleeding en pixel art
  */
 export function loadMichiSpritesheet(scene: Phaser.Scene): void {
   // Verificar si ya está cargado
@@ -80,7 +92,17 @@ export function loadMichiSpritesheet(scene: Phaser.Scene): void {
     frameWidth: SPRITE_CONFIG.frameWidth,
     frameHeight: SPRITE_CONFIG.frameHeight,
     startFrame: 0,
-    endFrame: SPRITE_CONFIG.columns * SPRITE_CONFIG.rows - 1
+    endFrame: SPRITE_CONFIG.columns * SPRITE_CONFIG.rows - 1,
+    spacing: SPRITE_CONFIG.spacing,
+    margin: SPRITE_CONFIG.margin
+  });
+
+  // Aplicar filtro NEAREST después de cargar para pixel art nítido
+  scene.load.once('complete', () => {
+    const texture = scene.textures.get('michi-spritesheet');
+    if (texture && texture.source && texture.source[0]) {
+      texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+    }
   });
 }
 
@@ -140,8 +162,9 @@ export class MichiSprite {
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     this.sprite = scene.add.sprite(x, y, 'michi-spritesheet');
-    // El sprite de 128x128 es grande, lo escalamos para el juego
-    this.sprite.setScale(0.25); // 128 * 0.25 = 32px (tamaño de tile)
+    // El sprite de 256x256 se escala para el juego
+    // 256 * 0.15 ≈ 38px (buen tamaño para tiles de 32px)
+    this.sprite.setScale(0.15);
     this.playAnimation('idle');
   }
 

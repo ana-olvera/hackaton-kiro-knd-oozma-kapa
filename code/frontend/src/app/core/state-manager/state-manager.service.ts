@@ -9,6 +9,7 @@ export interface GameState {
   focus: number;
   stress: number;
   karenometer: number;
+  happiness: number; // Felicidad del personaje (afectado por Michi News y eventos)
   currentTime: number; // minutos desde las 9:00 (0 = 9AM, 540 = 6PM)
   level: number;
   score: number;
@@ -22,6 +23,7 @@ const INITIAL_STATE: GameState = {
   focus: 70,
   stress: 10,
   karenometer: 0,
+  happiness: 50, // Valor inicial de felicidad
   currentTime: 0,
   level: 1,
   score: 0

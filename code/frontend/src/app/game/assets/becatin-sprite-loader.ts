@@ -38,7 +38,7 @@ const BECATIN_SPRITE_CONFIG = {
     spacing: 0
   },
   // Escala ligeramente menor a Michi Godin (becario más pequeño pero visible)
-  defaultScale: 0.12   // Michi usa 0.15, Becatín usa 0.12 (un poco más pequeño)
+  defaultScale: 0.24  // Michi usa 0.15, Becatín usa 0.12 (un poco más pequeño)
 };
 
 /**

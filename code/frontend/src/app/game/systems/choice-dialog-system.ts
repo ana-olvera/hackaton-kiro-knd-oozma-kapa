@@ -139,16 +139,23 @@ export class ChoiceDialogSystem {
   private currentDialog: ChoiceDialog | null = null;
   private buttonContainers: Phaser.GameObjects.Container[] = [];
   private selectedIndex = 0;
+  private michiNewsSprite: Phaser.GameObjects.Sprite | null = null; // Sprite visual de Michi News
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
+    console.log('[ChoiceDialogSystem] Sistema inicializado');
   }
 
   /**
    * Muestra un diálogo de Michi News con opciones de elección
    */
   show(onChoice: (effects: ChoiceOption['effects'], choiceText: string) => void): boolean {
-    if (this.isActive) return false;
+    console.log('[ChoiceDialogSystem] Intentando mostrar diálogo');
+    
+    if (this.isActive) {
+      console.warn('[ChoiceDialogSystem] Ya hay un diálogo activo, abortando');
+      return false;
+    }
 
     this.onChoiceCallback = onChoice;
     this.isActive = true;
@@ -161,7 +168,10 @@ export class ChoiceDialogSystem {
       ...dialogTemplate
     };
 
+    console.log('[ChoiceDialogSystem] Diálogo seleccionado:', this.currentDialog.dialogue);
+
     this.createUI();
+    this.createMichiNewsSprite();
     return true;
   }
 
@@ -373,6 +383,8 @@ export class ChoiceDialogSystem {
   }
 
   private hide(): void {
+    console.log('[ChoiceDialogSystem] Ocultando diálogo');
+    
     if (this.container) {
       this.scene.tweens.add({
         targets: this.container,
@@ -383,15 +395,32 @@ export class ChoiceDialogSystem {
           this.container?.destroy();
           this.container = null;
           this.buttonContainers = [];
+          console.log('[ChoiceDialogSystem] Container destruido');
         }
       });
     }
 
-    // Limpiar listeners de teclado
-    this.scene.input.keyboard!.resetKeys();
+    // Ocultar sprite de Michi News
+    if (this.michiNewsSprite) {
+      this.scene.tweens.add({
+        targets: this.michiNewsSprite,
+        alpha: 0,
+        scale: 0.1,
+        duration: 200,
+        onComplete: () => {
+          this.michiNewsSprite?.destroy();
+          this.michiNewsSprite = null;
+          console.log('[ChoiceDialogSystem] Sprite de Michi News destruido');
+        }
+      });
+    }
+
+    // NO resetear todas las teclas - eso rompe los controles de movimiento
+    // Solo los listeners del diálogo se eliminan automáticamente cuando se destruye el container
 
     this.isActive = false;
     this.currentDialog = null;
+    console.log('[ChoiceDialogSystem] Diálogo cerrado, isActive=false');
   }
 
   /**
@@ -408,5 +437,41 @@ export class ChoiceDialogSystem {
     if (this.isActive) {
       this.hide();
     }
+  }
+
+  /**
+   * Crea el sprite visual de Michi News que aparece al lado del diálogo
+   */
+  private createMichiNewsSprite(): void {
+    console.log('[ChoiceDialogSystem] Intentando crear sprite de Michi News');
+    
+    // Verificar que el texture exista
+    if (!this.scene.textures.exists('michi-news')) {
+      console.error('[ChoiceDialogSystem] Texture "michi-news" no existe. Debe cargarse en preload()');
+      return;
+    }
+
+    console.log('[ChoiceDialogSystem] Texture encontrada, creando sprite');
+
+    // Posición a la izquierda del diálogo
+    const x = 80;
+    const y = 150;
+
+    this.michiNewsSprite = this.scene.add.sprite(x, y, 'michi-news');
+    this.michiNewsSprite.setScale(0.15); // Ajustar escala
+    this.michiNewsSprite.setScrollFactor(0);
+    this.michiNewsSprite.setDepth(1999); // Justo debajo del diálogo
+    this.michiNewsSprite.setAlpha(0);
+
+    // Animación de entrada
+    this.scene.tweens.add({
+      targets: this.michiNewsSprite,
+      alpha: 1,
+      scale: 0.2,
+      duration: 300,
+      ease: 'Back.easeOut'
+    });
+
+    console.log('[ChoiceDialogSystem] Sprite de Michi News creado exitosamente');
   }
 }

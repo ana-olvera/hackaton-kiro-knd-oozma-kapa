@@ -108,6 +108,8 @@ export class OfficeScene extends Phaser.Scene {
   }
 
   preload(): void {
+    console.log('[OfficeScene] Iniciando preload()');
+    
     SpriteGenerator.generateAll(this);
     this.load.atlas(
       'michi-emotions',
@@ -117,6 +119,12 @@ export class OfficeScene extends Phaser.Scene {
     
     // Cargar nuevo spritesheet de Michi con animaciones (generado con DALL-E)
     loadMichiSpritesheet(this);
+    
+    // Cargar sprite de Michi News para el sistema de diálogos
+    console.log('[OfficeScene] Cargando sprite de Michi News');
+    this.load.image('michi-news', 'assets/sprites/michi_news.png');
+    
+    console.log('[OfficeScene] Preload completado');
   }
 
   create(): void {
@@ -154,14 +162,15 @@ export class OfficeScene extends Phaser.Scene {
       }
     }
 
-    // Michi - Usando el nuevo spritesheet de DALL-E
-    // Imagen: 1024x2048, frames de 256x256 px
+    // Michi - Usando el spritesheet de DALL-E
+    // Imagen: 506x1024, frames de 126x128 px
     this.michi = this.add.sprite(7 * tileSize, 7 * tileSize, 'michi-spritesheet', 0);
-    this.michi.setScale(0.15); // 256 * 0.15 ≈ 38px, buen tamaño para el juego
+    this.michi.setScale(0.3); // 126 * 0.3 ≈ 38px, buen tamaño para el juego
     this.physics.add.existing(this.michi);
     const michiBody = this.michi.body as Phaser.Physics.Arcade.Body;
-    michiBody.setSize(180, 200);
-    michiBody.setOffset(38, 28);
+    // Cuerpo de colisión ajustado al frame real de 126x128 px
+    michiBody.setSize(90, 100);
+    michiBody.setOffset(18, 14);
     michiBody.setCollideWorldBounds(true);
     this.physics.add.collider(this.michi, this.walls);
     this.createMichiAnimations();
@@ -241,8 +250,8 @@ export class OfficeScene extends Phaser.Scene {
   }
 
   private createMichiAnimations(): void {
-    // Usar las animaciones del nuevo spritesheet de DALL-E
-    // El spritesheet tiene 4 columnas x 8 filas, cada frame de 256x256
+    // Usar las animaciones del spritesheet de DALL-E
+    // El spritesheet tiene 4 columnas x 8 filas, cada frame de 126x128
     
     // Fila 0: Idle (frames 0-3)
     if (!this.anims.exists('michi-idle')) {
@@ -355,6 +364,11 @@ export class OfficeScene extends Phaser.Scene {
       return;
     }
 
+    // Verificar que michi y sus animaciones estén listos
+    if (!this.michi || !this.michi.anims) {
+      return;
+    }
+
     const speed = 100;
     const body = this.michi.body as Phaser.Physics.Arcade.Body;
     body.setVelocity(0);
@@ -363,11 +377,11 @@ export class OfficeScene extends Phaser.Scene {
 
     // Input: teclado o controles móviles (HTML overlay via window)
     const mobile = (window as unknown as Record<string, unknown>)['__michiMobileInput'] as { left: boolean; right: boolean; up: boolean; down: boolean; interact: boolean } | undefined;
-    const left = this.cursors.left.isDown || (mobile?.left ?? false);
-    const right = this.cursors.right.isDown || (mobile?.right ?? false);
-    const up = this.cursors.up.isDown || (mobile?.up ?? false);
-    const down = this.cursors.down.isDown || (mobile?.down ?? false);
-    const interact = Phaser.Input.Keyboard.JustDown(this.interactKey) || (mobile?.interact ?? false);
+    const left = this.cursors?.left?.isDown || (mobile?.left ?? false);
+    const right = this.cursors?.right?.isDown || (mobile?.right ?? false);
+    const up = this.cursors?.up?.isDown || (mobile?.up ?? false);
+    const down = this.cursors?.down?.isDown || (mobile?.down ?? false);
+    const interact = (this.interactKey && Phaser.Input.Keyboard.JustDown(this.interactKey)) || (mobile?.interact ?? false);
 
     if (left) { body.setVelocityX(-speed); moving = true; this.michi.setFlipX(true); }
     else if (right) { body.setVelocityX(speed); moving = true; this.michi.setFlipX(false); }
@@ -375,9 +389,15 @@ export class OfficeScene extends Phaser.Scene {
     else if (down) { body.setVelocityY(speed); moving = true; }
 
     if (moving) {
-      this.michi.anims.play('michi-walk', true);
+      // Verificar que la animación existe antes de reproducirla
+      if (this.anims.exists('michi-walk')) {
+        this.michi.anims.play('michi-walk', true);
+      }
     } else {
-      this.michi.anims.play('michi-idle', true);
+      // Verificar que la animación existe antes de reproducirla
+      if (this.anims.exists('michi-idle')) {
+        this.michi.anims.play('michi-idle', true);
+      }
     }
 
     if (interact) {
@@ -484,15 +504,25 @@ export class OfficeScene extends Phaser.Scene {
    * Muestra el diálogo interactivo de Michi News con opciones de elección.
    */
   private showMichiNewsDialog(): void {
+    console.log('[OfficeScene] showMichiNewsDialog() llamado');
+    
     // Pausar sistemas mientras se muestra el diálogo
+    console.log('[OfficeScene] Pausando sistemas del juego');
     this.timeSystem.pause();
     this.karenSystem.stop();
     this.eventsSystem.stop();
 
     // Mostrar diálogo con elección
-    this.choiceDialogSystem.show((effects, choiceText) => {
+    console.log('[OfficeScene] Llamando a choiceDialogSystem.show()');
+    const success = this.choiceDialogSystem.show((effects, choiceText) => {
       this.handleMichiNewsChoice(effects, choiceText);
     });
+    
+    if (success) {
+      console.log('[OfficeScene] Diálogo de Michi News mostrado exitosamente');
+    } else {
+      console.error('[OfficeScene] Fallo al mostrar diálogo de Michi News');
+    }
   }
 
   /**

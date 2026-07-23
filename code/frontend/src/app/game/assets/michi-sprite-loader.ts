@@ -3,19 +3,19 @@ import * as Phaser from 'phaser';
 /**
  * Configuración del spritesheet de Michi Godín
  * 
- * ESPECIFICACIONES TÉCNICAS:
- * - Dimensiones totales: 1024 x 2048 píxeles
+ * ESPECIFICACIONES TÉCNICAS (según la imagen real michi_godin.png):
+ * - Dimensiones totales: 506 x 1024 píxeles
  * - Grid: 4 columnas x 8 filas (32 celdas)
- * - Tamaño de cada celda: 256 x 256 píxeles
+ * - Tamaño de cada celda: 126 x 128 píxeles (506/4 ≈ 126, 1024/8 = 128)
  * - Origen: Esquina superior izquierda (0,0)
  * - Filter Mode: Point (No Filter) / Nearest Neighbor
  * - Compression: None (RGBA 32-bit)
  */
 
-// Configuración exacta según especificaciones de la IA
+// Configuración ajustada a las dimensiones reales de la imagen (506x1024)
 const SPRITE_CONFIG = {
-  frameWidth: 256,   // Ancho exacto de cada celda
-  frameHeight: 256,  // Alto exacto de cada celda
+  frameWidth: 126,   // Ancho de cada celda (506 / 4 columnas ≈ 126)
+  frameHeight: 128,  // Alto de cada celda (1024 / 8 filas = 128)
   columns: 4,        // Columnas en el spritesheet
   rows: 8,           // Filas en el spritesheet
   spacing: 0,        // Sin espacio entre frames

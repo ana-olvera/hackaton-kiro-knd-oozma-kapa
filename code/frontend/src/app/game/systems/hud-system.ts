@@ -1,8 +1,10 @@
 import * as Phaser from 'phaser';
+import { MobileControls, MobileInput } from './mobile-controls';
 
 /**
  * HUD Scene - Escena superpuesta que muestra la UI sin verse afectada por el zoom.
  * Se ejecuta en paralelo sobre la OfficeScene.
+ * También gestiona los controles móviles táctiles.
  */
 
 interface StatBar {
@@ -25,6 +27,7 @@ export class HudScene extends Phaser.Scene {
   private portraitImage!: Phaser.GameObjects.Image;
   private portraitBorder!: Phaser.GameObjects.Rectangle;
   private emotionLabel!: Phaser.GameObjects.Text;
+  private mobileControls!: MobileControls;
 
   private readonly BAR_WIDTH = 55;
   private readonly BAR_HEIGHT = 7;
@@ -35,6 +38,10 @@ export class HudScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Controles móviles (se renderizan aquí, en espacio 800x600 sin zoom)
+    this.mobileControls = new MobileControls(this);
+    this.mobileControls.create();
+
     // Fondo semi-transparente del HUD (esquina superior izquierda)
     const hudBg = this.add.rectangle(
       this.PADDING - 2, this.PADDING - 2, 170, 165, 0x000000, 0.8
@@ -224,6 +231,13 @@ export class HudScene extends Phaser.Scene {
     return labels[emotion] || emotion;
   }
 
+  getMobileInput(): MobileInput | null {
+    if (this.mobileControls && this.mobileControls.isEnabled()) {
+      return this.mobileControls.getInput();
+    }
+    return null;
+  }
+
   private getEmotionColor(emotion: string): number {
     const colors: Record<string, number> = {
       happy: 0x00FF88, tired: 0xFFAA44, sleeping: 0x6688FF,
@@ -349,6 +363,10 @@ export class HudSystem {
     duration?: number;
   }): void {
     this.hudScene?.showNotification(config);
+  }
+
+  getMobileInput(): MobileInput | null {
+    return this.hudScene?.getMobileInput() || null;
   }
 
   destroy(): void {

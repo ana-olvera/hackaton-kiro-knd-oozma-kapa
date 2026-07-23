@@ -10,7 +10,6 @@ import { EventsSystem, OfficeEvent } from '../systems/events-system';
 import { DialogueSystem } from '../systems/dialogue-system';
 import { AchievementsSystem } from '../systems/achievements-system';
 import { AudioSystem } from '../systems/audio-system';
-import { MobileControls } from '../systems/mobile-controls';
 import { ProgressionSystem } from '../systems/progression-system';
 import { ChoiceDialogSystem, ChoiceOption } from '../systems/choice-dialog-system';
 
@@ -40,9 +39,6 @@ export class OfficeScene extends Phaser.Scene {
   private audioSystem!: AudioSystem;
   private progressionSystem!: ProgressionSystem;
   private choiceDialogSystem!: ChoiceDialogSystem; // Sistema para Michi News interactivo
-
-  // Sistemas Fase 3
-  private mobileControls!: MobileControls;
 
   // Estado del juego
   private gameState = {
@@ -230,10 +226,6 @@ export class OfficeScene extends Phaser.Scene {
 
     this.dialogueSystem = new DialogueSystem(this);
 
-    // === SISTEMAS FASE 3 ===
-    this.mobileControls = new MobileControls(this);
-    this.mobileControls.create();
-
     // Degradación pasiva
     this.degradeTimer = this.time.addEvent({
       delay: 5000,
@@ -369,8 +361,8 @@ export class OfficeScene extends Phaser.Scene {
 
     let moving = false;
 
-    // Input: teclado o controles móviles
-    const mobile = this.mobileControls.isEnabled() ? this.mobileControls.getInput() : null;
+    // Input: teclado o controles móviles (HTML overlay via window)
+    const mobile = (window as unknown as Record<string, unknown>)['__michiMobileInput'] as { left: boolean; right: boolean; up: boolean; down: boolean; interact: boolean } | undefined;
     const left = this.cursors.left.isDown || (mobile?.left ?? false);
     const right = this.cursors.right.isDown || (mobile?.right ?? false);
     const up = this.cursors.up.isDown || (mobile?.up ?? false);
@@ -388,7 +380,11 @@ export class OfficeScene extends Phaser.Scene {
       this.michi.anims.play('michi-idle', true);
     }
 
-    if (interact) this.checkInteraction();
+    if (interact) {
+      this.checkInteraction();
+      // Reset interact para que no se dispare múltiples veces
+      if (mobile) mobile.interact = false;
+    }
 
     // Tracking estrés bajo para logro zen
     if (this.gameState.stress < 20) {

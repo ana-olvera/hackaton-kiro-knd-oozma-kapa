@@ -37,6 +37,10 @@ export class KarenSystem {
 
   private baseInterval = 15000;
   private minInterval = 5000;
+  
+  // Seguimiento para coordinación con NPC
+  private lastMessageTime = 0;
+  private messagesCount = 0;
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
@@ -44,6 +48,8 @@ export class KarenSystem {
 
   start(onMessage?: (msg: KarenMessage) => void): void {
     this.onMessageCallback = onMessage || null;
+    this.lastMessageTime = Date.now();
+    this.messagesCount = 0;
     this.scheduleNextMessage();
   }
 
@@ -56,6 +62,34 @@ export class KarenSystem {
 
   setKarenLevel(level: number): void {
     this.karenLevel = Math.max(0, Math.min(100, level));
+  }
+
+  /**
+   * Obtiene el nivel actual del Karenómetro
+   */
+  getKarenLevel(): number {
+    return this.karenLevel;
+  }
+
+  /**
+   * Obtiene el tiempo desde el último mensaje (en ms)
+   */
+  getTimeSinceLastMessage(): number {
+    return Date.now() - this.lastMessageTime;
+  }
+
+  /**
+   * Obtiene el número total de mensajes enviados
+   */
+  getMessagesCount(): number {
+    return this.messagesCount;
+  }
+
+  /**
+   * Indica si está programado el siguiente mensaje
+   */
+  isActive(): boolean {
+    return this.timer !== null;
   }
 
   private scheduleNextMessage(): void {
@@ -73,6 +107,11 @@ export class KarenSystem {
 
   private sendMessage(): void {
     const message = KAREN_MESSAGES[Math.floor(Math.random() * KAREN_MESSAGES.length)];
+    
+    // Actualizar seguimiento
+    this.lastMessageTime = Date.now();
+    this.messagesCount++;
+    
     if (this.onMessageCallback) {
       this.onMessageCallback(message);
     }

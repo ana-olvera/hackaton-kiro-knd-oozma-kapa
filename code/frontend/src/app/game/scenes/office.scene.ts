@@ -1,7 +1,10 @@
 import * as Phaser from 'phaser';
 import { SpriteGenerator } from '../assets/sprite-generator';
 import { loadMichiSpritesheet, createMichiAnimations, MichiSprite, MichiState } from '../assets/michi-sprite-loader';
+import { loadKarenSpritesheet, createKarenAnimations } from '../assets/karen-sprite-loader';
 import { KarenSystem, KarenMessage } from '../systems/karen-system';
+import { KarenNpc } from '../systems/karen-npc';
+import { KarenMessageBubble } from '../systems/karen-message-bubble';
 import { TimeSystem } from '../systems/time-system';
 import { HudSystem } from '../systems/hud-system';
 import { PortraitSystem } from '../systems/portrait-system';
@@ -30,6 +33,10 @@ export class OfficeScene extends Phaser.Scene {
   private timeSystem!: TimeSystem;
   private hudSystem!: HudSystem;
   private portraitSystem!: PortraitSystem;
+
+  // Sistemas de Karen NPC
+  private karenNpc!: KarenNpc;
+  private karenMessageBubble!: KarenMessageBubble;
 
   // Sistemas Fase 2
   private npcSystem!: NpcSystem;
@@ -120,6 +127,10 @@ export class OfficeScene extends Phaser.Scene {
     // Cargar nuevo spritesheet de Michi con animaciones (generado con DALL-E)
     loadMichiSpritesheet(this);
     
+    // Cargar spritesheet de Karen para el NPC
+    console.log('[OfficeScene] Cargando spritesheet de Karen');
+    loadKarenSpritesheet(this);
+    
     // Cargar sprite de Michi News para el sistema de diálogos
     console.log('[OfficeScene] Cargando sprite de Michi News');
     this.load.image('michi-news', 'assets/sprites/michi_news.png');
@@ -175,6 +186,16 @@ export class OfficeScene extends Phaser.Scene {
     this.physics.add.collider(this.michi, this.walls);
     this.createMichiAnimations();
 
+    // Crear animaciones de Karen
+    createKarenAnimations(this);
+
+    // Crear Karen NPC (posición en esquina de la oficina, alejada de Michi)
+    console.log('[OfficeScene] Creando Karen NPC');
+    this.karenNpc = new KarenNpc(this, 18 * tileSize, 4 * tileSize, this.walls, this.michi);
+    
+    // Crear sistema de globos de mensaje de Karen
+    this.karenMessageBubble = new KarenMessageBubble(this);
+
     // Controles teclado
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.interactKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.E);
@@ -203,6 +224,9 @@ export class OfficeScene extends Phaser.Scene {
 
     this.karenSystem = new KarenSystem(this);
     this.karenSystem.start((msg: KarenMessage) => this.handleKarenMessage(msg));
+
+    // Configurar Karen NPC con nivel inicial
+    this.karenNpc.updateKarenLevel(this.gameState.karenometer);
 
     // === SISTEMAS FASE 2 ===
     this.audioSystem = new AudioSystem();
@@ -406,6 +430,12 @@ export class OfficeScene extends Phaser.Scene {
       if (mobile) mobile.interact = false;
     }
 
+    // Actualizar Karen NPC
+    this.karenNpc.update(this.time.now, this.game.loop.delta);
+    
+    // Actualizar globo de mensaje de Karen
+    this.karenMessageBubble.update();
+
     // Tracking estrés bajo para logro zen
     if (this.gameState.stress < 20) {
       this.achievementsSystem.trackLowStress(this.game.loop.delta);
@@ -458,20 +488,37 @@ export class OfficeScene extends Phaser.Scene {
     this.gameState.karenometer = Math.min(100, this.gameState.karenometer + msg.karenImpact);
     this.gameState.focus = Math.max(0, this.gameState.focus - 5);
     this.karenSystem.setKarenLevel(this.gameState.karenometer);
+    
+    // Actualizar Karen NPC con nuevo nivel
+    this.karenNpc.updateKarenLevel(this.gameState.karenometer);
+    
+    // Hacer que Karen realice animación de envío de mensaje
+    this.karenNpc.performAction('phone', 2500);
+    
+    // Mostrar globo de mensaje sobre Karen si está visible
+    if (this.karenNpc.isNearMichi(150)) {
+      this.karenMessageBubble.show(this.karenNpc.getSprite(), {
+        message: msg.text,
+        duration: 3500,
+        stressImpact: msg.stressImpact,
+        karenImpact: msg.karenImpact
+      });
+    } else {
+      // Si Karen está lejos, mostrar notificación tradicional en HUD
+      this.hudSystem.showNotification({
+        title: 'Karen (Teams)',
+        text: msg.text,
+        color: '#FF6B6B',
+        icon: '📱',
+        subtext: `+${msg.stressImpact} estrés`,
+        position: 'bottom-center',
+        duration: 4000
+      });
+    }
+    
     this.updateHud();
     this.portraitSystem.setTemporaryEmotion('surprised', 2000);
     this.audioSystem.playTeamsNotification();
-
-    // Mostrar notificación en HUD (sin zoom)
-    this.hudSystem.showNotification({
-      title: 'Karen',
-      text: msg.text,
-      color: '#FF6B6B',
-      icon: '💬',
-      subtext: `+${msg.stressImpact} estrés`,
-      position: 'bottom-center',
-      duration: 4000
-    });
 
     if (this.gameState.stress >= 100) this.handleGameOver('estrés');
   }
@@ -633,6 +680,8 @@ export class OfficeScene extends Phaser.Scene {
 
   private handleDayEnd(): void {
     this.karenSystem.stop();
+    this.karenNpc.destroy();
+    this.karenMessageBubble.forceCleanup();
     this.npcSystem.stop();
     this.eventsSystem.stop();
     this.degradeTimer.destroy();
@@ -664,6 +713,8 @@ export class OfficeScene extends Phaser.Scene {
 
   private handleGameOver(reason: string): void {
     this.karenSystem.stop();
+    this.karenNpc.destroy();
+    this.karenMessageBubble.forceCleanup();
     this.npcSystem.stop();
     this.eventsSystem.stop();
     this.timeSystem.stop();

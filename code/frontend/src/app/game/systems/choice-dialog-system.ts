@@ -453,14 +453,15 @@ export class ChoiceDialogSystem {
 
     console.log('[ChoiceDialogSystem] Texture encontrada, creando sprite');
 
-    // Posición a la izquierda del diálogo
-    const x = 80;
+    // Posición a la izquierda del panel, para no taparlo
+    const x = 55;
     const y = 150;
 
     this.michiNewsSprite = this.scene.add.sprite(x, y, 'michi-news');
     this.michiNewsSprite.setScale(0.15); // Ajustar escala
     this.michiNewsSprite.setScrollFactor(0);
-    this.michiNewsSprite.setDepth(1999); // Justo debajo del diálogo
+    // Depth por encima del overlay del diálogo (2000) para que sea visible
+    this.michiNewsSprite.setDepth(2001);
     this.michiNewsSprite.setAlpha(0);
 
     // Animación de entrada

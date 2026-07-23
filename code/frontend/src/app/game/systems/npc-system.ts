@@ -132,8 +132,11 @@ export class NpcSystem {
     const npc = NPC_CONFIGS[Math.floor(Math.random() * NPC_CONFIGS.length)];
     this.activeNpc = npc;
 
+    console.log(`[NpcSystem] Apareciendo NPC: ${npc.name} (${npc.id})`);
+
     // Si el NPC requiere elección (Michi News), usar callback especial
     if (npc.requiresChoice && this.onChoiceNpcCallback) {
+      console.log('[NpcSystem] Michi News requiere elección, invocando diálogo');
       this.cooldown = true;
       this.onChoiceNpcCallback();
       return;

@@ -76,7 +76,7 @@ export class MenuScene extends Phaser.Scene {
       '   ☕    Café = Energía',
     ].join('\n'), {
       fontSize: '10px',
-      color: '#777777',
+      color: '#dad5d5ff',
       lineSpacing: 6
     }).setOrigin(0.5);
 
@@ -135,8 +135,8 @@ export class MenuScene extends Phaser.Scene {
 
     // Versión
     this.add.text(width / 2, height - 15, 'v0.1.0 MVP | Equipo Oozma Kapa', {
-      fontSize: '8px',
-      color: '#333355'
+      fontSize: '18px',
+      color: '#d2d2d6ff'
     }).setOrigin(0.5);
 
     // Fade in al entrar

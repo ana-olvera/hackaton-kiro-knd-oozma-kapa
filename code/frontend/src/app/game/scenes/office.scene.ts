@@ -8,6 +8,8 @@ import { KarenNpc } from '../systems/karen-npc';
 import { KarenMessageBubble } from '../systems/karen-message-bubble';
 import { BecatinNpc } from '../systems/becatin-npc';
 import { BecatinEventsSystem, BecatinEvent } from '../systems/becatin-events-system';
+import { MichiNewsNpc } from '../systems/michi-news-npc';
+import { InteractiveMessageBubble } from '../systems/interactive-message-bubble';
 import { TimeSystem } from '../systems/time-system';
 import { HudSystem } from '../systems/hud-system';
 import { PortraitSystem } from '../systems/portrait-system';
@@ -45,8 +47,10 @@ export class OfficeScene extends Phaser.Scene {
   private becatinNpc!: BecatinNpc;
   private becatinEventsSystem!: BecatinEventsSystem;
 
-  // Michi News (sprite simple para interacciones de diálogo)
+  // Michi News NPC con chismes
   private michiNewsSprite!: Phaser.GameObjects.Sprite;
+  private michiNewsNpc!: MichiNewsNpc;
+  private interactiveBubble!: InteractiveMessageBubble;
 
   // Sistemas Fase 2
   private npcSystem!: NpcSystem;
@@ -264,8 +268,8 @@ export class OfficeScene extends Phaser.Scene {
       this.michi
     );
 
-    // Michi News en su escritorio (sprite simple, no NPC complejo)
-    console.log('[OfficeScene] Creando Michi News en escritorio');
+    // Sistema completo de Michi News NPC con chismes y globos interactivos
+    console.log('[OfficeScene] Creando sistema Michi News NPC');
     this.michiNewsSprite = this.add.sprite(
       OfficeScene.DESK_POSITIONS.MICHI_NEWS.X, 
       OfficeScene.DESK_POSITIONS.MICHI_NEWS.Y + 40, 
@@ -275,11 +279,29 @@ export class OfficeScene extends Phaser.Scene {
     this.michiNewsSprite.setScale(0.3); // Misma escala que Michi Godin
     this.michiNewsSprite.setDepth(100);
     
-    // Agregar física básica a Michi News
-    this.physics.add.existing(this.michiNewsSprite);
-    const michiNewsBody = this.michiNewsSprite.body as Phaser.Physics.Arcade.Body;
-    michiNewsBody.setSize(20, 25);
-    michiNewsBody.setOffset(10, 15);
+    // Inicializar sistema de globos interactivos
+    this.interactiveBubble = new InteractiveMessageBubble(this);
+    
+    // Inicializar MichiNewsNpc con comportamiento completo
+    this.michiNewsNpc = new MichiNewsNpc(
+      this,
+      this.michiNewsSprite,
+      OfficeScene.DESK_POSITIONS.MICHI_NEWS.X,
+      OfficeScene.DESK_POSITIONS.MICHI_NEWS.Y + 40,
+      this.walls,
+      this.michi
+    );
+    
+    // Configurar callback para efectos de chismes
+    this.michiNewsNpc.setGossipCallback((effects: any, message: string) => {
+      // Aplicar efectos a las estadísticas del jugador usando HudSystem
+      if (effects.happiness) this.hudSystem.updateStat('happiness', effects.happiness);
+      if (effects.stress) this.hudSystem.updateStat('stress', effects.stress);
+      if (effects.energy) this.hudSystem.updateStat('energy', effects.energy);
+      
+      console.log('[OfficeScene] Efectos del chisme aplicados:', effects);
+      console.log('[OfficeScene] Mensaje:', message);
+    });
     this.physics.add.collider(this.michiNewsSprite, this.walls);
     this.physics.add.collider(this.michiNewsSprite, this.michi);
 
@@ -534,6 +556,10 @@ export class OfficeScene extends Phaser.Scene {
 
     // Actualizar Becatín NPC
     this.becatinNpc.update(this.time.now, this.game.loop.delta);
+    
+    // Actualizar Michi News NPC y sistema de globos interactivos
+    this.michiNewsNpc.update(this.time.now, this.game.loop.delta);
+    this.interactiveBubble.update();
 
     // Tracking estrés bajo para logro zen
     if (this.gameState.stress < 20) {

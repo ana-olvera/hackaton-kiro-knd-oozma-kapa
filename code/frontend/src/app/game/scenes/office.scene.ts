@@ -70,15 +70,15 @@ export class OfficeScene extends Phaser.Scene {
     startTime: 0
   };
 
-  // Posiciones específicas de escritorios para cada personaje
+  // Posiciones específicas de escritorios para cada personaje (con más espacio)
   private static readonly DESK_POSITIONS = {
     MICHI_GODIN: { ROW: 6, COL: 12, X: 12 * 32 + 16, Y: 6 * 32 + 16 }, // Centro - escritorio principal interactivo
-    BECATIN: { ROW: 4, COL: 20, X: 20 * 32 + 16, Y: 4 * 32 + 16 },      // Derecha superior - escritorio gaming 
-    KAREN: { ROW: 4, COL: 6, X: 6 * 32 + 16, Y: 4 * 32 + 16 },          // Izquierda superior - escritorio ejecutivo jefa
-    MICHI_NEWS: { ROW: 8, COL: 8, X: 8 * 32 + 16, Y: 8 * 32 + 16 },     // Izquierda inferior
-    GENERIC_1: { ROW: 10, COL: 14, X: 14 * 32 + 16, Y: 10 * 32 + 16 },  // Centro inferior
-    GENERIC_2: { ROW: 8, COL: 18, X: 18 * 32 + 16, Y: 8 * 32 + 16 },    // Derecha inferior
-    COFFEE_AREA: { ROW: 12, COL: 20, X: 20 * 32 + 16, Y: 12 * 32 + 16 } // Esquina inferior derecha
+    BECATIN: { ROW: 3, COL: 20, X: 20 * 32 + 16, Y: 3 * 32 + 16 },      // Esquina superior derecha - escritorio gaming 
+    KAREN: { ROW: 3, COL: 4, X: 4 * 32 + 16, Y: 3 * 32 + 16 },          // Esquina superior izquierda - escritorio ejecutivo jefa
+    MICHI_NEWS: { ROW: 9, COL: 6, X: 6 * 32 + 16, Y: 9 * 32 + 16 },     // Izquierda inferior
+    GENERIC_1: { ROW: 12, COL: 12, X: 12 * 32 + 16, Y: 12 * 32 + 16 },  // Centro inferior
+    GENERIC_2: { ROW: 9, COL: 18, X: 18 * 32 + 16, Y: 9 * 32 + 16 },    // Derecha inferior
+    COFFEE_AREA: { ROW: 15, COL: 20, X: 20 * 32 + 16, Y: 15 * 32 + 16 } // Esquina muy inferior derecha
   };
 
   // Tracking para logros
@@ -90,22 +90,24 @@ export class OfficeScene extends Phaser.Scene {
   // Minijuegos disponibles según nivel
   private availableMinigames: string[] = ['GitBasicScene'];
 
-  // Mapa renovado de la oficina cyberpunk: 0=piso, 1=pared, 6=escritorio_personalizado, 7=cafetera
+  // Mapa renovado de la oficina cyberpunk con más espacio: 0=piso, 1=pared, 6=escritorio_personalizado, 7=cafetera
   private officeMap: number[][] = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 1], // Karen (col 4), Becatín (col 20)
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 1], // Karen (col 6), Becatín (col 20)
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // Michi Godin (col 12)
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 1], // Michi News (col 8), Genérico 2 (col 18)
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // Genérico 1 (col 14)
+    [1, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 1], // Michi News (col 6), Genérico 2 (col 18)
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // Genérico 1 (col 12)
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 1], // Cafetera (col 20)
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
@@ -933,9 +935,11 @@ export class OfficeScene extends Phaser.Scene {
       deskSprite = 'desk-generic-1'; // Fallback
     }
 
-    // Crear sprite del escritorio
-    const desk = this.add.sprite(x, y, deskSprite);
-    desk.setScale(0.1); // Ajustar escala según necesidad
+    // Crear sprite del escritorio con ajustes para evitar recorte
+    const desk = this.add.sprite(x, y - 8, deskSprite) // Subir 8px para evitar corte inferior
+      .setScale(0.1) // Escala apropiada
+      .setOrigin(0.5, 0.9); // Ajustar origen para mejor posicionamiento
+    
     this.officeObjects.push(desk);
     this.walls.add(desk); // Los escritorios son obstáculos
 
@@ -950,9 +954,11 @@ export class OfficeScene extends Phaser.Scene {
    * Crea el área de cafetera común
    */
   private createCoffeeArea(x: number, y: number): void {
-    // Usar la nueva estación de café cyberpunk
-    const coffeeStation = this.add.sprite(x, y, 'coffee-station');
-    coffeeStation.setScale(0.09); // Escala apropiada para que se vea bien en la oficina
+    // Usar la nueva estación de café cyberpunk con ajustes para evitar recorte
+    const coffeeStation = this.add.sprite(x, y - 12, 'coffee-station') // Subir 12px para evitar corte inferior
+      .setScale(0.1) // Escala apropiada (incrementada de 0.09 a 0.5)
+      .setOrigin(0.5, 0.8); // Ajustar origen para mejor posicionamiento
+    
     this.officeObjects.push(coffeeStation);
     this.walls.add(coffeeStation); // La estación de café es un obstáculo
 

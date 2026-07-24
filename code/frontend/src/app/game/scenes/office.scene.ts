@@ -73,11 +73,11 @@ export class OfficeScene extends Phaser.Scene {
   // Posiciones específicas de escritorios para cada personaje (con más espacio)
   private static readonly DESK_POSITIONS = {
     MICHI_GODIN: { ROW: 6, COL: 12, X: 12 * 32 + 16, Y: 6 * 32 + 16 }, // Centro - escritorio principal interactivo
-    BECATIN: { ROW: 3, COL: 20, X: 20 * 32 + 16, Y: 3 * 32 + 16 },      // Esquina superior derecha - escritorio gaming 
+    BECATIN: { ROW: 6, COL: 18, X: 18 * 32 + 16, Y: 6 * 32 + 16 },      // Misma fila que Michi, más cerca - escritorio gaming 
     KAREN: { ROW: 3, COL: 4, X: 4 * 32 + 16, Y: 3 * 32 + 16 },          // Esquina superior izquierda - escritorio ejecutivo jefa
     MICHI_NEWS: { ROW: 9, COL: 6, X: 6 * 32 + 16, Y: 9 * 32 + 16 },     // Izquierda inferior
     GENERIC_1: { ROW: 12, COL: 12, X: 12 * 32 + 16, Y: 12 * 32 + 16 },  // Centro inferior
-    GENERIC_2: { ROW: 9, COL: 18, X: 18 * 32 + 16, Y: 9 * 32 + 16 },    // Derecha inferior
+    GENERIC_2: { ROW: 9, COL: 20, X: 20 * 32 + 16, Y: 9 * 32 + 16 },    // Derecha inferior
     COFFEE_AREA: { ROW: 15, COL: 20, X: 20 * 32 + 16, Y: 15 * 32 + 16 } // Esquina muy inferior derecha
   };
 
@@ -95,13 +95,13 @@ export class OfficeScene extends Phaser.Scene {
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 1], // Karen (col 4), Becatín (col 20)
+    [1, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // Karen (col 4)
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // Michi Godin (col 12)
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 1], // Michi Godin (col 12), Becatín (col 18)
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 1], // Michi News (col 6), Genérico 2 (col 18)
+    [1, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 1], // Michi News (col 6), Genérico 2 (col 20)
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // Genérico 1 (col 12)
@@ -210,7 +210,7 @@ export class OfficeScene extends Phaser.Scene {
 
     // Michi - posicionado en su escritorio (de pie, no sentado)
     const michiStartX = OfficeScene.DESK_POSITIONS.MICHI_GODIN.X;
-    const michiStartY = OfficeScene.DESK_POSITIONS.MICHI_GODIN.Y + 40; // 40px enfrente del escritorio
+    const michiStartY = OfficeScene.DESK_POSITIONS.MICHI_GODIN.Y; // 40px enfrente del escritorio
     this.michi = this.add.sprite(michiStartX, michiStartY, 'michi-spritesheet', 0);
     this.michi.setScale(0.3);
     this.physics.add.existing(this.michi);

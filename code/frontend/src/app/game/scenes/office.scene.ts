@@ -159,8 +159,23 @@ export class OfficeScene extends Phaser.Scene {
     loadBecatinSpritesheet(this);
     
     // Cargar sprite de Michi News para el sistema de diálogos
-    console.log('[OfficeScene] Cargando sprite de Michi News');
-    this.load.image('michi-news', 'assets/sprites/michi_news.png');
+    console.log('[OfficeScene] Cargando spritesheet de Michi News');
+    this.load.spritesheet('michi-news-spritesheet', 'assets/sprites/michi_news.png', {
+      frameWidth: 126,   // Igual que Michi Godin
+      frameHeight: 128,  // Igual que Michi Godin
+      startFrame: 0,
+      endFrame: 31,      // 32 frames (4x8 grid como Michi Godin)
+      margin: 0,
+      spacing: 0
+    });
+
+    // Aplicar filtro NEAREST a Michi News después de cargar
+    this.load.once('complete', () => {
+      const michiNewsTexture = this.textures.get('michi-news-spritesheet');
+      if (michiNewsTexture && michiNewsTexture.source && michiNewsTexture.source[0]) {
+        michiNewsTexture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+      }
+    });
     
     // === CARGAR NUEVOS SPRITES CYBERPUNK ===
     console.log('[OfficeScene] Cargando nuevos sprites de oficina cyberpunk');
@@ -254,9 +269,10 @@ export class OfficeScene extends Phaser.Scene {
     this.michiNewsSprite = this.add.sprite(
       OfficeScene.DESK_POSITIONS.MICHI_NEWS.X, 
       OfficeScene.DESK_POSITIONS.MICHI_NEWS.Y + 40, 
-      'michi-news'
+      'michi-news-spritesheet',
+      0  // Frame 0 (idle)
     );
-    this.michiNewsSprite.setScale(0.12); // Misma escala que Becatín
+    this.michiNewsSprite.setScale(0.3); // Misma escala que Michi Godin
     this.michiNewsSprite.setDepth(100);
     
     // Agregar física básica a Michi News

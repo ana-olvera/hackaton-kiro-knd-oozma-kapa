@@ -45,6 +45,9 @@ export class OfficeScene extends Phaser.Scene {
   private becatinNpc!: BecatinNpc;
   private becatinEventsSystem!: BecatinEventsSystem;
 
+  // Michi News (sprite simple para interacciones de diálogo)
+  private michiNewsSprite!: Phaser.GameObjects.Sprite;
+
   // Sistemas Fase 2
   private npcSystem!: NpcSystem;
   private eventsSystem!: EventsSystem;
@@ -245,6 +248,24 @@ export class OfficeScene extends Phaser.Scene {
       this.walls, 
       this.michi
     );
+
+    // Michi News en su escritorio (sprite simple, no NPC complejo)
+    console.log('[OfficeScene] Creando Michi News en escritorio');
+    this.michiNewsSprite = this.add.sprite(
+      OfficeScene.DESK_POSITIONS.MICHI_NEWS.X, 
+      OfficeScene.DESK_POSITIONS.MICHI_NEWS.Y + 40, 
+      'michi-news'
+    );
+    this.michiNewsSprite.setScale(0.12); // Misma escala que Becatín
+    this.michiNewsSprite.setDepth(100);
+    
+    // Agregar física básica a Michi News
+    this.physics.add.existing(this.michiNewsSprite);
+    const michiNewsBody = this.michiNewsSprite.body as Phaser.Physics.Arcade.Body;
+    michiNewsBody.setSize(20, 25);
+    michiNewsBody.setOffset(10, 15);
+    this.physics.add.collider(this.michiNewsSprite, this.walls);
+    this.physics.add.collider(this.michiNewsSprite, this.michi);
 
     // Sistema de globos de mensaje de Karen
     this.karenMessageBubble = new KarenMessageBubble(this);

@@ -70,17 +70,15 @@ export class OfficeScene extends Phaser.Scene {
     startTime: 0
   };
 
-  // Constantes para el escritorio de Becatín
-  private static readonly BECATIN_DESK = {
-    ROW: 5,
-    COL_DESK: 20,
-    COL_COFFEE: 21,
-    COL_COMPUTER: 22,
-    // Coordenadas en píxeles (col * tileSize + tileSize/2, row * tileSize + tileSize/2)
-    DESK_X: 20 * 32 + 16,    // 656px
-    DESK_Y: 5 * 32 + 16,     // 176px
-    COMPUTER_X: 22 * 32 + 16, // 720px
-    COMPUTER_Y: 5 * 32 + 16   // 176px
+  // Posiciones específicas de escritorios para cada personaje
+  private static readonly DESK_POSITIONS = {
+    MICHI_GODIN: { ROW: 6, COL: 12, X: 12 * 32 + 16, Y: 6 * 32 + 16 }, // Centro - escritorio principal interactivo
+    BECATIN: { ROW: 4, COL: 20, X: 20 * 32 + 16, Y: 4 * 32 + 16 },      // Derecha superior - escritorio gaming 
+    KAREN: { ROW: 4, COL: 6, X: 6 * 32 + 16, Y: 4 * 32 + 16 },          // Izquierda superior - escritorio ejecutivo jefa
+    MICHI_NEWS: { ROW: 8, COL: 8, X: 8 * 32 + 16, Y: 8 * 32 + 16 },     // Izquierda inferior
+    GENERIC_1: { ROW: 10, COL: 14, X: 14 * 32 + 16, Y: 10 * 32 + 16 },  // Centro inferior
+    GENERIC_2: { ROW: 8, COL: 18, X: 18 * 32 + 16, Y: 8 * 32 + 16 },    // Derecha inferior
+    COFFEE_AREA: { ROW: 12, COL: 20, X: 20 * 32 + 16, Y: 12 * 32 + 16 } // Esquina inferior derecha
   };
 
   // Tracking para logros
@@ -92,23 +90,21 @@ export class OfficeScene extends Phaser.Scene {
   // Minijuegos disponibles según nivel
   private availableMinigames: string[] = ['GitBasicScene'];
 
-  // Mapa de la oficina: 0=piso, 1=pared, 2=escritorio, 3=computadora, 4=café, 5=silla
-  // Escritorio de Becatín designado en posición (20, 5): tiles 2, 4, 3 (escritorio + café + computadora)
+  // Mapa renovado de la oficina cyberpunk: 0=piso, 1=pared, 6=escritorio_personalizado, 7=cafetera
   private officeMap: number[][] = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 2, 3, 0, 5, 0, 0, 2, 3, 0, 5, 0, 0, 2, 3, 0, 5, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 2, 3, 0, 5, 0, 0, 2, 3, 0, 5, 0, 0, 2, 3, 0, 5, 0, 0, 2, 4, 3, 0, 1],
+    [1, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 1], // Karen (col 6), Becatín (col 20)
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // Michi Godin (col 12)
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 2, 3, 0, 5, 0, 0, 2, 3, 0, 5, 0, 0, 2, 3, 0, 5, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 1], // Michi News (col 8), Genérico 2 (col 18)
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // Genérico 1 (col 14)
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 1], // Cafetera (col 20)
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -161,6 +157,18 @@ export class OfficeScene extends Phaser.Scene {
     console.log('[OfficeScene] Cargando sprite de Michi News');
     this.load.image('michi-news', 'assets/sprites/michi_news.png');
     
+    // === CARGAR NUEVOS SPRITES CYBERPUNK ===
+    console.log('[OfficeScene] Cargando nuevos sprites de oficina cyberpunk');
+    
+    // Escritorios específicos para cada personaje
+    this.load.image('desk-michi-godin', 'assets/objetos/escritorio_michi_godin.png');
+    this.load.image('desk-becatin', 'assets/objetos/escritorio_michi_becatin.png');
+    this.load.image('desk-generic-1', 'assets/objetos/escritorio_michi_generico.png');
+    this.load.image('desk-generic-2', 'assets/objetos/escritorio_michi_generico_2.png');
+    
+    // Elementos decorativos
+    this.load.image('office-elements', 'assets/objetos/michi_elementos_oficina.png');
+    
     console.log('[OfficeScene] Preload completado');
   }
 
@@ -171,72 +179,72 @@ export class OfficeScene extends Phaser.Scene {
     // Física
     this.walls = this.physics.add.staticGroup();
 
-    // Renderizar tilemap
+    // Renderizar tilemap con nuevos sprites cyberpunk
     for (let row = 0; row < this.officeMap.length; row++) {
       for (let col = 0; col < this.officeMap[row].length; col++) {
         const tileIndex = this.officeMap[row][col];
         const x = col * tileSize + tileSize / 2;
         const y = row * tileSize + tileSize / 2;
 
+        // Suelo base (siempre presente)
         this.add.sprite(x, y, 'office-tiles', 0);
 
         if (tileIndex === 1) {
+          // Paredes
           const wall = this.add.sprite(x, y, 'office-tiles', 1);
           this.walls.add(wall);
-        } else if (tileIndex >= 2) {
-          const obj = this.add.sprite(x, y, 'office-tiles', tileIndex);
-          this.officeObjects.push(obj);
-          if (tileIndex === 2 || tileIndex === 4) this.walls.add(obj);
-          if (tileIndex === 4) {
-            const zone = this.add.zone(x, y, tileSize + 16, tileSize + 16);
-            this.interactionZones.push({ zone, type: 'coffee' });
-          }
-          if (tileIndex === 3) {
-            const zone = this.add.zone(x, y, tileSize + 16, tileSize + 16);
-            this.interactionZones.push({ zone, type: 'computer' });
-          }
+        } else if (tileIndex === 6) {
+          // Escritorios personalizados según ubicación
+          this.createCustomDesk(row, col, x, y);
+        } else if (tileIndex === 7) {
+          // Cafetera en área común
+          this.createCoffeeArea(x, y);
         }
       }
     }
 
-    // Michi - Usando el spritesheet de DALL-E
-    // Imagen: 506x1024, frames de 126x128 px
-    this.michi = this.add.sprite(7 * tileSize, 7 * tileSize, 'michi-spritesheet', 0);
-    this.michi.setScale(0.3); // 126 * 0.3 ≈ 38px, buen tamaño para el juego
+    // Michi - posicionado en su escritorio (de pie, no sentado)
+    const michiStartX = OfficeScene.DESK_POSITIONS.MICHI_GODIN.X;
+    const michiStartY = OfficeScene.DESK_POSITIONS.MICHI_GODIN.Y + 40; // 40px enfrente del escritorio
+    this.michi = this.add.sprite(michiStartX, michiStartY, 'michi-spritesheet', 0);
+    this.michi.setScale(0.3);
     this.physics.add.existing(this.michi);
     const michiBody = this.michi.body as Phaser.Physics.Arcade.Body;
-    // Cuerpo de colisión ajustado al frame real de 126x128 px
     michiBody.setSize(90, 100);
     michiBody.setOffset(18, 14);
     michiBody.setCollideWorldBounds(true);
     this.physics.add.collider(this.michi, this.walls);
     this.createMichiAnimations();
 
-    // Crear animaciones de Karen
+    // Crear animaciones de personajes
     createKarenAnimations(this);
-
-    // Crear animaciones de Becatín
     createBecatinAnimations(this);
 
-    // Crear Karen NPC (posición en esquina de la oficina, alejada de Michi)
-    console.log('[OfficeScene] Creando Karen NPC');
-    this.karenNpc = new KarenNpc(this, 18 * tileSize, 4 * tileSize, this.walls, this.michi);
+    // Crear NPCs en sus escritorios respectivos (de pie)
+    console.log('[OfficeScene] Creando NPCs en sus escritorios');
     
-    // Crear sistema de globos de mensaje de Karen
-    this.karenMessageBubble = new KarenMessageBubble(this);
-
-    // Crear Becatín NPC en su escritorio designado
-    console.log('[OfficeScene] Creando Becatín NPC');
-    const becatinDesk = this.getBecatinDeskCoordinates();
+    // Karen NPC en su escritorio ejecutivo
+    this.karenNpc = new KarenNpc(
+      this, 
+      OfficeScene.DESK_POSITIONS.KAREN.X, 
+      OfficeScene.DESK_POSITIONS.KAREN.Y + 40, 
+      this.walls, 
+      this.michi
+    );
+    
+    // Becatín NPC en su escritorio gaming  
     this.becatinNpc = new BecatinNpc(
       this, 
-      becatinDesk.deskX, 
-      becatinDesk.deskY, 
+      OfficeScene.DESK_POSITIONS.BECATIN.X, 
+      OfficeScene.DESK_POSITIONS.BECATIN.Y + 40, 
       this.walls, 
       this.michi
     );
 
-    // Crear sistema de eventos de Becatín
+    // Sistema de globos de mensaje de Karen
+    this.karenMessageBubble = new KarenMessageBubble(this);
+
+    // Sistema de eventos de Becatín
     this.becatinEventsSystem = new BecatinEventsSystem(this);
 
     // Controles teclado
@@ -251,7 +259,7 @@ export class OfficeScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.michi, true, 0.1, 0.1);
     this.cameras.main.setZoom(2);
 
-    // === SISTEMAS FASE 1 ===
+    // === INICIALIZAR SISTEMAS ===
     this.hudSystem = new HudSystem(this);
     this.hudSystem.create();
 
@@ -271,21 +279,16 @@ export class OfficeScene extends Phaser.Scene {
     // Configurar Karen NPC con nivel inicial
     this.karenNpc.updateKarenLevel(this.gameState.karenometer);
 
-    // Configurar callback para eventos de Becatín
+    // Configurar callbacks de eventos
     this.becatinEventsSystem.setEventCallback((event: BecatinEvent) => this.handleBecatinEvent(event));
-    
-    // Configurar callback para acciones de Becatín NPC
     this.becatinNpc.setActionCallback((effects: any, message: string) => {
-      // Generar evento aleatorio basado en el mensaje
       this.becatinEventsSystem.generateRandomEvent();
     });
 
-    // === SISTEMAS FASE 2 ===
+    // Sistemas adicionales
     this.audioSystem = new AudioSystem();
-
     this.achievementsSystem = new AchievementsSystem();
     this.achievementsSystem.setScene(this);
-
     this.progressionSystem = new ProgressionSystem();
     const difficulty = this.progressionSystem.getDifficulty();
     this.availableMinigames = this.mapMinigameScenes(this.progressionSystem.getAvailableMinigames());
@@ -293,13 +296,12 @@ export class OfficeScene extends Phaser.Scene {
     this.npcSystem = new NpcSystem(this);
     this.choiceDialogSystem = new ChoiceDialogSystem(this);
     
-    // Iniciar NPC system con soporte para NPCs con elección (Michi News)
+    // Iniciar NPC system con soporte para Michi News
     this.npcSystem.start(
       (effect: NpcEffect, npcId: string) => {
         this.handleNpcEffect(effect, npcId);
       },
       () => {
-        // Callback para Michi News: mostrar diálogo con elección
         this.showMichiNewsDialog();
       }
     );
@@ -311,7 +313,7 @@ export class OfficeScene extends Phaser.Scene {
 
     this.dialogueSystem = new DialogueSystem(this);
 
-    // Degradación pasiva
+    // Degradación pasiva de estadísticas
     this.degradeTimer = this.time.addEvent({
       delay: 5000,
       callback: this.degradeStats,
@@ -892,14 +894,67 @@ export class OfficeScene extends Phaser.Scene {
 
   /**
    * Obtiene las coordenadas del escritorio designado para Becatín
-   * Usado por el sistema BecatinNpc para saber dónde debe sentarse
+   * Usado por el sistema BecatinNpc para saber dónde debe posicionarse
    */
   getBecatinDeskCoordinates(): { deskX: number; deskY: number; computerX: number; computerY: number } {
     return {
-      deskX: OfficeScene.BECATIN_DESK.DESK_X,
-      deskY: OfficeScene.BECATIN_DESK.DESK_Y,
-      computerX: OfficeScene.BECATIN_DESK.COMPUTER_X,
-      computerY: OfficeScene.BECATIN_DESK.COMPUTER_Y
+      deskX: OfficeScene.DESK_POSITIONS.BECATIN.X,
+      deskY: OfficeScene.DESK_POSITIONS.BECATIN.Y,
+      computerX: OfficeScene.DESK_POSITIONS.BECATIN.X,
+      computerY: OfficeScene.DESK_POSITIONS.BECATIN.Y
     };
+  }
+
+  /**
+   * Crea un escritorio personalizado según la ubicación en el mapa
+   */
+  private createCustomDesk(row: number, col: number, x: number, y: number): void {
+    let deskSprite: string;
+    let isInteractive = false;
+    
+    // Determinar qué tipo de escritorio crear según posición
+    if (row === OfficeScene.DESK_POSITIONS.MICHI_GODIN.ROW && col === OfficeScene.DESK_POSITIONS.MICHI_GODIN.COL) {
+      deskSprite = 'desk-michi-godin';
+      isInteractive = true; // Solo el escritorio de Michi Godin es interactivo
+    } else if (row === OfficeScene.DESK_POSITIONS.BECATIN.ROW && col === OfficeScene.DESK_POSITIONS.BECATIN.COL) {
+      deskSprite = 'desk-becatin';
+    } else if (row === OfficeScene.DESK_POSITIONS.KAREN.ROW && col === OfficeScene.DESK_POSITIONS.KAREN.COL) {
+      deskSprite = 'desk-generic-1'; // Escritorio ejecutivo para Karen
+    } else if (row === OfficeScene.DESK_POSITIONS.MICHI_NEWS.ROW && col === OfficeScene.DESK_POSITIONS.MICHI_NEWS.COL) {
+      deskSprite = 'desk-generic-1'; // Escritorio para Michi News
+    } else if (row === OfficeScene.DESK_POSITIONS.GENERIC_1.ROW && col === OfficeScene.DESK_POSITIONS.GENERIC_1.COL) {
+      deskSprite = 'desk-generic-2';
+    } else if (row === OfficeScene.DESK_POSITIONS.GENERIC_2.ROW && col === OfficeScene.DESK_POSITIONS.GENERIC_2.COL) {
+      deskSprite = 'desk-generic-2';
+    } else {
+      deskSprite = 'desk-generic-1'; // Fallback
+    }
+
+    // Crear sprite del escritorio
+    const desk = this.add.sprite(x, y, deskSprite);
+    desk.setScale(0.1); // Ajustar escala según necesidad
+    this.officeObjects.push(desk);
+    this.walls.add(desk); // Los escritorios son obstáculos
+
+    // Crear zona de interacción solo para el escritorio de Michi Godin
+    if (isInteractive) {
+      const zone = this.add.zone(x, y, 64, 64); // Zona más grande para facilitar interacción
+      this.interactionZones.push({ zone, type: 'computer' });
+    }
+  }
+
+  /**
+   * Crea el área de cafetera común
+   */
+  private createCoffeeArea(x: number, y: number): void {
+    // Usar sprite de elementos de oficina para la cafetera
+    const coffeeArea = this.add.sprite(x, y, 'office-elements');
+    coffeeArea.setScale(0.1); // Escala apropiada
+    this.officeObjects.push(coffeeArea);
+    this.walls.add(coffeeArea); // La cafetera es un obstáculo
+
+    // Zona de interacción para tomar café
+    const zone = this.add.zone(x, y, 48, 48);
+    this.interactionZones.push({ zone, type: 'coffee' });
   }
 }

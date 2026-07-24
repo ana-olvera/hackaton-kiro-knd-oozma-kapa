@@ -560,6 +560,9 @@ export class OfficeScene extends Phaser.Scene {
     // Actualizar Michi News NPC y sistema de globos interactivos
     this.michiNewsNpc.update(this.time.now, this.game.loop.delta);
     this.interactiveBubble.update();
+    
+    // Sistema global de depth sorting para todos los personajes
+    this.updateGlobalDepthSorting();
 
     // Tracking estrés bajo para logro zen
     if (this.gameState.stress < 20) {
@@ -1028,5 +1031,29 @@ export class OfficeScene extends Phaser.Scene {
     // Zona de interacción para tomar café
     const zone = this.add.zone(x, y, 64, 64); // Zona más grande para facilitar acceso
     this.interactionZones.push({ zone, type: 'coffee' });
+  }
+
+  /**
+   * Sistema global de depth sorting para todos los personajes
+   * Regla profesional: mientras más abajo (mayor Y), mayor depth (se dibuja encima)
+   */
+  private updateGlobalDepthSorting(): void {
+    const baseDepth = 100;
+    
+    // Lista de todos los sprites que deben tener depth sorting
+    const spritesToSort = [
+      this.michi,
+      this.michiNewsSprite,
+      this.karenNpc?.getSprite(),
+      this.becatinNpc?.getSprite()
+    ].filter(sprite => sprite && sprite.active);
+    
+    // Aplicar depth basado en posición Y
+    spritesToSort.forEach(sprite => {
+      if (sprite) {
+        const newDepth = baseDepth + Math.floor(sprite.y);
+        sprite.setDepth(newDepth);
+      }
+    });
   }
 }

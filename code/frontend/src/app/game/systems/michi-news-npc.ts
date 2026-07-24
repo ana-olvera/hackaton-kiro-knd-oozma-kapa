@@ -235,6 +235,9 @@ export class MichiNewsNpc {
     // Mantener posición y animación excited
     this.body.setVelocity(0, 0);
     
+    // Actualizar depth sorting incluso cuando está quieto
+    this.updateDepthSorting();
+    
     // Verificar timeout (se maneja en showGossipBubble)
     // La lógica de timeout está en el delayedCall
   }
@@ -244,6 +247,7 @@ export class MichiNewsNpc {
    */
   private updateTellingGossip(time: number): void {
     this.body.setVelocity(0, 0);
+    this.updateDepthSorting(); // Mantener depth correcto
     // La animación y regreso se manejan en onGossipAccepted
   }
 
@@ -259,11 +263,29 @@ export class MichiNewsNpc {
       this.targetPosition.x, this.targetPosition.y
     );
     
+    // Actualizar depth basado en posición Y (Y-sorting para juegos isométricos)
+    this.updateDepthSorting();
+    
     if (distance < 35) { // Aumentar distancia para evitar superposición
       this.showGossipBubble(); // Llegó cerca de Michi - mostrar chisme
     } else {
       this.moveTowardsTarget(); // Continuar caminando
     }
+  }
+
+  /**
+   * Actualiza el depth sorting basado en la posición Y
+   * Regla: mientras más abajo (mayor Y), mayor depth (se dibuja encima)
+   */
+  private updateDepthSorting(): void {
+    // Base depth + posición Y para sorting automático
+    const baseDepth = 100;
+    const newDepth = baseDepth + Math.floor(this.sprite.y);
+    this.sprite.setDepth(newDepth);
+    
+    // También actualizar depth del Michi Godin para que respete el sorting
+    const michiDepth = baseDepth + Math.floor(this.michiSprite.y);
+    this.michiSprite.setDepth(michiDepth);
   }
 
   /**
@@ -334,6 +356,9 @@ export class MichiNewsNpc {
    */
   private updateReturningToDesk(): void {
     if (!this.targetPosition) return;
+    
+    // Actualizar depth sorting durante el movimiento
+    this.updateDepthSorting();
     
     const currentPos = { x: this.sprite.x, y: this.sprite.y };
     const distance = Phaser.Math.Distance.Between(

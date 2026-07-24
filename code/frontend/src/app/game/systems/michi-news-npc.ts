@@ -217,11 +217,11 @@ export class MichiNewsNpc {
     this.stateStartTime = time;
     this.currentGossip = this.getRandomGossip();
     
-    // Posición cerca de Michi
+    // Posición cerca de Michi pero manteniendo distancia para evitar superposición
     const michiPos = { x: this.michiSprite.x, y: this.michiSprite.y };
     this.targetPosition = {
-      x: michiPos.x + (Math.random() - 0.5) * 40, // Posición aleatoria cerca
-      y: michiPos.y + (Math.random() - 0.5) * 40
+      x: michiPos.x + 50, // Mantener distancia horizontal
+      y: michiPos.y + 25  // Ligeramente desplazado verticalmente
     };
     
     this.sprite.play('michi-news-walk', true);
@@ -259,7 +259,7 @@ export class MichiNewsNpc {
       this.targetPosition.x, this.targetPosition.y
     );
     
-    if (distance < 20) {
+    if (distance < 35) { // Aumentar distancia para evitar superposición
       this.showGossipBubble(); // Llegó cerca de Michi - mostrar chisme
     } else {
       this.moveTowardsTarget(); // Continuar caminando

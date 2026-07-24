@@ -76,9 +76,9 @@ export class InteractiveMessageBubble {
     const { accept, decline } = this.currentConfig.buttons;
     
     if (accept) {
-      const btn = this.scene.add.text(-30, -20, accept.text, {
+      const btn = this.scene.add.text(0, 15, accept.text, {
         fontSize: '10px', color: '#FFFFFF', backgroundColor: this.currentConfig.character.accentColor,
-        padding: { x: 8, y: 4 }
+        padding: { x: 10, y: 5 }
       }).setOrigin(0.5).setInteractive();
       
       btn.on('pointerdown', () => { accept.callback(); this.hide(); });
@@ -86,9 +86,9 @@ export class InteractiveMessageBubble {
     }
     
     if (decline) {
-      const btn = this.scene.add.text(30, -20, decline.text, {
+      const btn = this.scene.add.text(60, 15, decline.text, {
         fontSize: '10px', color: '#FFFFFF', backgroundColor: '#666666',
-        padding: { x: 8, y: 4 }
+        padding: { x: 10, y: 5 }
       }).setOrigin(0.5).setInteractive();
       
       btn.on('pointerdown', () => { decline.callback(); this.hide(); });
@@ -103,9 +103,9 @@ export class InteractiveMessageBubble {
     const color = Phaser.Display.Color.HexStringToColor(this.currentConfig.character.color).color;
     
     this.bubble.fillStyle(color, 0.9);
-    this.bubble.fillRoundedRect(-120, -60, 240, 80, 12);
+    this.bubble.fillRoundedRect(-120, -70, 240, 100, 12); // Más alto para el botón
     this.bubble.lineStyle(2, 0xffffff, 0.5);
-    this.bubble.strokeRoundedRect(-120, -60, 240, 80, 12);
+    this.bubble.strokeRoundedRect(-120, -70, 240, 100, 12);
     
     this.container.add(this.bubble);
   }
@@ -113,7 +113,7 @@ export class InteractiveMessageBubble {
   private createMessageText(): void {
     if (!this.currentConfig || !this.container) return;
     
-    this.messageText = this.scene.add.text(0, -35, this.currentConfig.message, {
+    this.messageText = this.scene.add.text(0, -50, this.currentConfig.message, {
       fontSize: '11px', color: '#FFFFFF', align: 'center',
       wordWrap: { width: 220 }, fontStyle: 'bold'
     }).setOrigin(0.5);

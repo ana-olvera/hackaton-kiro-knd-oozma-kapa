@@ -166,6 +166,9 @@ export class OfficeScene extends Phaser.Scene {
     this.load.image('desk-generic-1', 'assets/objetos/escritorio_michi_generico.png');
     this.load.image('desk-generic-2', 'assets/objetos/escritorio_michi_generico_2.png');
     
+    // Estación de café cyberpunk
+    this.load.image('coffee-station', 'assets/objetos/michi_estacion_cafe.png');
+    
     // Elementos decorativos
     this.load.image('office-elements', 'assets/objetos/michi_elementos_oficina.png');
     
@@ -947,14 +950,14 @@ export class OfficeScene extends Phaser.Scene {
    * Crea el área de cafetera común
    */
   private createCoffeeArea(x: number, y: number): void {
-    // Usar sprite de elementos de oficina para la cafetera
-    const coffeeArea = this.add.sprite(x, y, 'office-elements');
-    coffeeArea.setScale(0.1); // Escala apropiada
-    this.officeObjects.push(coffeeArea);
-    this.walls.add(coffeeArea); // La cafetera es un obstáculo
+    // Usar la nueva estación de café cyberpunk
+    const coffeeStation = this.add.sprite(x, y, 'coffee-station');
+    coffeeStation.setScale(0.09); // Escala apropiada para que se vea bien en la oficina
+    this.officeObjects.push(coffeeStation);
+    this.walls.add(coffeeStation); // La estación de café es un obstáculo
 
     // Zona de interacción para tomar café
-    const zone = this.add.zone(x, y, 48, 48);
+    const zone = this.add.zone(x, y, 64, 64); // Zona más grande para facilitar acceso
     this.interactionZones.push({ zone, type: 'coffee' });
   }
 }

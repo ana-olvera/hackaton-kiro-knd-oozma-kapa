@@ -56,14 +56,14 @@ export class MenuScene extends Phaser.Scene {
 
     // Título del juego (lado izquierdo)
     this.add.text(width / 2 - 140, height / 4, '🐱 Ayuda a\nMichi Godín', {
-      fontSize: '26px',
+      fontSize: '32px',
       color: '#ffffff',
       fontStyle: 'bold',
-      lineSpacing: 8
+      lineSpacing: 10
     }).setOrigin(0.5);
 
-    this.add.text(width / 2 - 140, height / 4 + 60, 'Sobrevive al Sprint', {
-      fontSize: '14px',
+    this.add.text(width / 2 - 140, height / 4 + 70, 'Sobrevive al Sprint', {
+      fontSize: '18px',
       color: '#00FF88',
       fontStyle: 'italic'
     }).setOrigin(0.5);
@@ -75,17 +75,17 @@ export class MenuScene extends Phaser.Scene {
       '   💻    Minijuegos de Git',
       '   ☕    Café = Energía',
     ].join('\n'), {
-      fontSize: '10px',
+      fontSize: '14px',
       color: '#dad5d5ff',
-      lineSpacing: 6
+      lineSpacing: 8
     }).setOrigin(0.5);
 
     // Botón de inicio
-    const startButton = this.add.text(width / 2 - 140, height / 2 + 140, '▶ EMPEZAR LUNES', {
-      fontSize: '18px',
+    const startButton = this.add.text(width / 2 - 140, height / 2 + 150, '▶ EMPEZAR LUNES', {
+      fontSize: '22px',
       color: '#00ff88',
       backgroundColor: '#2d2d44',
-      padding: { x: 20, y: 10 }
+      padding: { x: 24, y: 12 }
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
     // Pulso en el botón de inicio
@@ -131,7 +131,7 @@ export class MenuScene extends Phaser.Scene {
     // Línea decorativa
     const graphics = this.add.graphics();
     graphics.lineStyle(1, 0x333355);
-    graphics.lineBetween(width / 2 - 20, 40, width / 2 - 20, height - 40);
+    graphics.lineBetween(width / 2 + 30, 40, width / 2 + 30, height - 40);
 
     // Versión
     this.add.text(width / 2, height - 15, 'v0.1.0 MVP | Equipo Oozma Kapa', {

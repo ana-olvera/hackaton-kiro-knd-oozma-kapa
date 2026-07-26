@@ -90,7 +90,7 @@ export class OfficeScene extends Phaser.Scene {
   // Minijuegos disponibles según nivel
   private availableMinigames: string[] = ['GitBasicScene'];
 
-  // Mapa renovado de la oficina cyberpunk con más espacio: 0=piso, 1=pared, 6=escritorio_personalizado, 7=cafetera
+  // Mapa renovado de la oficina cyberpunk con más espacio: 0=piso, 1=pared, 6=escritorio_personalizado, 7=cafetera, 8=comida
   private officeMap: number[][] = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -107,7 +107,7 @@ export class OfficeScene extends Phaser.Scene {
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // Genérico 1 (col 12)
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 1], // Cafetera (col 20)
+    [1, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 1], // Comida (col 4), Cafetera (col 20)
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
@@ -204,6 +204,9 @@ export class OfficeScene extends Phaser.Scene {
         } else if (tileIndex === 7) {
           // Cafetera en área común
           this.createCoffeeArea(x, y);
+        } else if (tileIndex === 8) {
+          // Zona de comida
+          this.createFoodArea(x, y);
         }
       }
     }
@@ -516,6 +519,7 @@ export class OfficeScene extends Phaser.Scene {
       if (dist < 48) {
         if (type === 'coffee') this.collectCoffee(zone.x, zone.y);
         else if (type === 'computer') this.startMinigame();
+        else if (type === 'food') this.eatFood(zone.x, zone.y);
         break;
       }
     }
@@ -744,10 +748,7 @@ export class OfficeScene extends Phaser.Scene {
       this.karenNpc.updateKarenLevel(this.gameState.karenometer);
     }
 
-    // Mostrar alerta como solicitó el usuario
-    alert(`${event.title}\n\n${event.message}`);
-
-    // También mostrar notificación en HUD
+    // Mostrar notificación en HUD (sin alert nativo)
     this.hudSystem.showNotification({
       title: `Becatín: ${event.title}`,
       text: event.message,
@@ -864,14 +865,42 @@ export class OfficeScene extends Phaser.Scene {
     this.audioSystem.playGameOver();
 
     const { width, height } = this.cameras.main;
-    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.8)
+    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.85)
       .setScrollFactor(0).setDepth(2000);
-    this.add.text(width / 2, height / 2,
+
+    this.add.text(width / 2, height / 2 - 60,
       `😿 Michi renunció...\nRazón: ${reason}\nPuntaje: ${this.gameState.score}`,
-      { fontSize: '14px', color: '#FF4444', align: 'center' }
+      { fontSize: '16px', color: '#FF4444', align: 'center' }
     ).setOrigin(0.5).setScrollFactor(0).setDepth(2001);
 
-    this.time.delayedCall(4000, () => this.scene.start('MenuScene'));
+    this.add.text(width / 2, height / 2 + 10,
+      '¿Quieres intentarlo de nuevo?',
+      { fontSize: '15px', color: '#FFFFFF', align: 'center' }
+    ).setOrigin(0.5).setScrollFactor(0).setDepth(2001);
+
+    // Botón: Reintentar mismo nivel
+    const retryBtn = this.add.text(width / 2, height / 2 + 55, '🔄  Reintentar nivel', {
+      fontSize: '16px', color: '#00FF88', backgroundColor: '#003322',
+      padding: { x: 20, y: 10 }
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(2001).setInteractive({ useHandCursor: true });
+
+    retryBtn.on('pointerover', () => retryBtn.setStyle({ backgroundColor: '#005533' }));
+    retryBtn.on('pointerout', () => retryBtn.setStyle({ backgroundColor: '#003322' }));
+    retryBtn.on('pointerdown', () => {
+      this.scene.start('OfficeScene');
+    });
+
+    // Botón: Volver al menú
+    const menuBtn = this.add.text(width / 2, height / 2 + 105, '🏠  Volver al inicio', {
+      fontSize: '16px', color: '#AAAAAA', backgroundColor: '#222233',
+      padding: { x: 20, y: 10 }
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(2001).setInteractive({ useHandCursor: true });
+
+    menuBtn.on('pointerover', () => menuBtn.setStyle({ backgroundColor: '#333344', color: '#FFFFFF' }));
+    menuBtn.on('pointerout', () => menuBtn.setStyle({ backgroundColor: '#222233', color: '#AAAAAA' }));
+    menuBtn.on('pointerdown', () => {
+      this.scene.start('MenuScene');
+    });
   }
 
   private degradeStats(): void {
@@ -989,5 +1018,54 @@ export class OfficeScene extends Phaser.Scene {
     // Zona de interacción para tomar café
     const zone = this.add.zone(x, y, 64, 64); // Zona más grande para facilitar acceso
     this.interactionZones.push({ zone, type: 'coffee' });
+  }
+
+  /**
+   * Crea el área de comida (refrigerador/snacks)
+   */
+  private createFoodArea(x: number, y: number): void {
+    // Crear sprite de área de comida usando gráficos programáticos
+    const foodArea = this.add.graphics();
+    // Refrigerador/dispensador de snacks
+    foodArea.fillStyle(0x445566, 1);
+    foodArea.fillRoundedRect(x - 14, y - 20, 28, 36, 4);
+    foodArea.fillStyle(0x556677, 1);
+    foodArea.fillRoundedRect(x - 12, y - 18, 24, 15, 3);
+    foodArea.fillStyle(0x667788, 1);
+    foodArea.fillRoundedRect(x - 12, y, 24, 13, 3);
+    // Manija
+    foodArea.fillStyle(0xCCCCCC, 1);
+    foodArea.fillRect(x + 8, y - 10, 2, 6);
+    foodArea.fillRect(x + 8, y + 3, 2, 6);
+
+    // Emoji de comida encima
+    this.add.text(x, y - 28, '🍕', { fontSize: '14px' }).setOrigin(0.5);
+
+    // Zona de interacción
+    const zone = this.add.zone(x, y, 64, 64);
+    this.interactionZones.push({ zone, type: 'food' });
+  }
+
+  /**
+   * Interacción: comer comida para reducir hambre
+   */
+  private eatFood(x: number, y: number): void {
+    const foods = [
+      { name: '🍕 Pizza', hunger: -30, energy: 15, happiness: 10 },
+      { name: '🍩 Dona', hunger: -15, energy: 5, happiness: 15 },
+      { name: '🥐 Concha', hunger: -20, energy: 10, happiness: 5 },
+      { name: '🌮 Taco', hunger: -25, energy: 10, happiness: 10 },
+      { name: '🍌 Plátano', hunger: -10, energy: 8, happiness: 3 },
+    ];
+
+    const food = foods[Math.floor(Math.random() * foods.length)];
+    
+    this.gameState.hunger = Math.max(0, this.gameState.hunger + food.hunger);
+    this.gameState.energy = Math.min(100, this.gameState.energy + food.energy);
+    this.gameState.happiness = Math.min(100, this.gameState.happiness + food.happiness);
+    this.updateHud();
+    this.showFloatingText(x, y - 20, `+${food.name}`);
+    this.portraitSystem.setTemporaryEmotion('eating', 2000);
+    this.audioSystem.playSuccess();
   }
 }

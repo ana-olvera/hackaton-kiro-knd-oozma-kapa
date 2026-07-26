@@ -47,6 +47,8 @@ export class KarenSystem {
   }
 
   start(onMessage?: (msg: KarenMessage) => void): void {
+    // Limpiar timer previo para evitar duplicados
+    this.stop();
     this.onMessageCallback = onMessage || null;
     this.lastMessageTime = Date.now();
     this.messagesCount = 0;

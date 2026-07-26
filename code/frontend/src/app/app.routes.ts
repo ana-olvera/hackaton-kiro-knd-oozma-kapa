@@ -12,6 +12,16 @@ export const routes: Routes = [
       import('./game/game.component').then(m => m.GameComponent)
   },
   {
+    path: 'achievements',
+    loadComponent: () =>
+      import('./ui/achievements/achievements.component').then(m => m.AchievementsComponent)
+  },
+  {
+    path: 'settings',
+    loadComponent: () =>
+      import('./ui/settings/settings.component').then(m => m.SettingsComponent)
+  },
+  {
     path: '**',
     redirectTo: ''
   }

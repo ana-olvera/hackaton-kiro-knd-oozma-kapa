@@ -62,6 +62,10 @@ export class OfficeScene extends Phaser.Scene {
   private choiceDialogSystem!: ChoiceDialogSystem; // Sistema para Michi News interactivo
 
   // Estado del juego
+  // Estado guardado entre transiciones de escena (sobrevive a scene.start)
+  private static savedTimeMinutes: number = -1;
+  private static savedGameState: any = null;
+
   private gameState = {
     energy: 80,
     coffee: 50,
@@ -70,7 +74,7 @@ export class OfficeScene extends Phaser.Scene {
     focus: 70,
     stress: 10,
     karenometer: 0,
-    happiness: 50, // Felicidad del personaje
+    happiness: 50,
     score: 0,
     coffeesToday: 0,
     minigamesCompleted: [] as string[],
@@ -97,7 +101,7 @@ export class OfficeScene extends Phaser.Scene {
   // Minijuegos disponibles según nivel
   private availableMinigames: string[] = ['GitBasicScene'];
 
-  // Mapa renovado de la oficina cyberpunk con más espacio: 0=piso, 1=pared, 6=escritorio_personalizado, 7=cafetera
+  // Mapa renovado de la oficina cyberpunk con más espacio: 0=piso, 1=pared, 6=escritorio_personalizado, 7=cafetera, 8=comida, 9=descanso
   private officeMap: number[][] = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -113,8 +117,8 @@ export class OfficeScene extends Phaser.Scene {
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // Genérico 1 (col 12)
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 1], // Cafetera (col 20)
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // Zona descanso (col 12)
+    [1, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 1], // Comida (col 4), Cafetera (col 20)
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
@@ -127,17 +131,26 @@ export class OfficeScene extends Phaser.Scene {
   }
 
   init(data?: { fromMinigame?: boolean; minigameResult?: boolean; minigameType?: string }): void {
-    if (data?.fromMinigame) {
-      if (data.minigameResult) {
-        this.gameState.score += 100;
-        this.gameState.stress = Math.max(0, this.gameState.stress - 10);
-        this.gameState.focus = Math.min(100, this.gameState.focus + 15);
-        if (data.minigameType) {
-          this.gameState.minigamesCompleted.push(data.minigameType);
-        }
-      } else {
-        this.gameState.stress = Math.min(100, this.gameState.stress + 5);
-      }
+    if (data?.fromMinigame && OfficeScene.savedGameState) {
+      // Restaurar estado guardado si venimos de un minijuego
+      this.gameState = { ...OfficeScene.savedGameState };
+      this.handleReturnFromMinigame(data);
+    } else {
+      // Reiniciar stats (nuevo juego o reintentar nivel)
+      this.gameState = {
+        energy: 80,
+        coffee: 50,
+        hunger: 30,
+        sleep: 20,
+        focus: 70,
+        stress: 10,
+        karenometer: 0,
+        happiness: 50,
+        score: 0,
+        coffeesToday: 0,
+        minigamesCompleted: [],
+        startTime: 0
+      };
     }
   }
 
@@ -226,6 +239,12 @@ export class OfficeScene extends Phaser.Scene {
         } else if (tileIndex === 7) {
           // Cafetera en área común
           this.createCoffeeArea(x, y);
+        } else if (tileIndex === 8) {
+          // Zona de comida
+          this.createFoodArea(x, y);
+        } else if (tileIndex === 9) {
+          // Zona de descanso
+          this.createRestArea(x, y);
         }
       }
     }
@@ -312,8 +331,13 @@ export class OfficeScene extends Phaser.Scene {
     this.becatinEventsSystem = new BecatinEventsSystem(this);
 
     // Controles teclado
-    this.cursors = this.input.keyboard!.createCursorKeys();
-    this.interactKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+    if (this.input.keyboard) {
+      this.input.keyboard.enabled = true;
+      this.cursors = this.input.keyboard.createCursorKeys();
+      this.interactKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+    }
+    // Asegurar que el canvas tiene foco para recibir input
+    this.game.canvas.focus();
 
     // Mundo y cámara
     const worldWidth = this.officeMap[0].length * tileSize;
@@ -337,6 +361,14 @@ export class OfficeScene extends Phaser.Scene {
       onDayEnd: () => this.handleDayEnd()
     });
 
+    // Restaurar tiempo guardado si venimos de un minijuego
+    if (OfficeScene.savedTimeMinutes >= 0) {
+      this.timeSystem.setCurrentMinutes(OfficeScene.savedTimeMinutes);
+      this.hudSystem.updateClock(this.timeSystem.getTimeString());
+      OfficeScene.savedTimeMinutes = -1;
+      OfficeScene.savedGameState = null;
+    }
+
     this.karenSystem = new KarenSystem(this);
     this.karenSystem.start((msg: KarenMessage) => this.handleKarenMessage(msg));
 
@@ -356,6 +388,12 @@ export class OfficeScene extends Phaser.Scene {
     this.progressionSystem = new ProgressionSystem();
     const difficulty = this.progressionSystem.getDifficulty();
     this.availableMinigames = this.mapMinigameScenes(this.progressionSystem.getAvailableMinigames());
+
+    // Mostrar nivel actual en el HUD (diferido para asegurar que HudScene esté lista)
+    const currentLevel = this.progressionSystem.getCurrentLevel();
+    this.time.delayedCall(100, () => {
+      this.hudSystem.updateLevel(currentLevel.name);
+    });
 
     this.npcSystem = new NpcSystem(this);
     this.choiceDialogSystem = new ChoiceDialogSystem(this);
@@ -507,7 +545,7 @@ export class OfficeScene extends Phaser.Scene {
     }
 
     // Verificar que michi y sus animaciones estén listos
-    if (!this.michi || !this.michi.anims) {
+    if (!this.michi || !this.michi.anims || !this.michi.body) {
       return;
     }
 
@@ -582,6 +620,8 @@ export class OfficeScene extends Phaser.Scene {
       if (dist < 48) {
         if (type === 'coffee') this.collectCoffee(zone.x, zone.y);
         else if (type === 'computer') this.startMinigame();
+        else if (type === 'food') this.eatFood(zone.x, zone.y);
+        else if (type === 'rest') this.takeBreak(zone.x, zone.y);
         break;
       }
     }
@@ -600,15 +640,31 @@ export class OfficeScene extends Phaser.Scene {
   }
 
   private startMinigame(): void {
-    this.timeSystem.pause();
-    this.karenSystem.stop();
-    this.npcSystem.stop();
-    this.eventsSystem.stop();
-    this.hudSystem.destroy();
+    // Guardar estado actual antes de ir al minijuego
+    OfficeScene.savedTimeMinutes = this.timeSystem.getCurrentMinutes();
+    OfficeScene.savedGameState = { ...this.gameState };
 
     // Elegir minijuego aleatorio de los disponibles
     const scene = this.availableMinigames[Math.floor(Math.random() * this.availableMinigames.length)];
     this.scene.start(scene, { returnScene: 'OfficeScene' });
+  }
+
+  /**
+   * Maneja el regreso de un minijuego: aplica recompensas y reanuda sistemas.
+   */
+  private handleReturnFromMinigame(data?: { fromMinigame?: boolean; minigameResult?: boolean; minigameType?: string }): void {
+    if (data?.fromMinigame && data.minigameResult) {
+      this.gameState.score += 100;
+      this.gameState.stress = Math.max(0, this.gameState.stress - 10);
+      this.gameState.focus = Math.min(100, this.gameState.focus + 15);
+      // +30 minutos avanzados: completar el minijuego acelera el día (más cerca de las 18:00)
+      OfficeScene.savedTimeMinutes = Math.min(539, OfficeScene.savedTimeMinutes + 30);
+      if (data.minigameType) {
+        this.gameState.minigamesCompleted.push(data.minigameType);
+      }
+    } else if (data?.fromMinigame) {
+      this.gameState.stress = Math.min(100, this.gameState.stress + 5);
+    }
   }
 
   private handleKarenMessage(msg: KarenMessage): void {
@@ -679,24 +735,22 @@ export class OfficeScene extends Phaser.Scene {
    * Muestra el diálogo interactivo de Michi News con opciones de elección.
    */
   private showMichiNewsDialog(): void {
-    console.log('[OfficeScene] showMichiNewsDialog() llamado');
-    
     // Pausar sistemas mientras se muestra el diálogo
-    console.log('[OfficeScene] Pausando sistemas del juego');
     this.timeSystem.pause();
     this.karenSystem.stop();
     this.eventsSystem.stop();
 
     // Mostrar diálogo con elección
-    console.log('[OfficeScene] Llamando a choiceDialogSystem.show()');
     const success = this.choiceDialogSystem.show((effects, choiceText) => {
       this.handleMichiNewsChoice(effects, choiceText);
     });
     
-    if (success) {
-      console.log('[OfficeScene] Diálogo de Michi News mostrado exitosamente');
-    } else {
-      console.error('[OfficeScene] Fallo al mostrar diálogo de Michi News');
+    if (!success) {
+      // Si falló, reanudar sistemas inmediatamente para no trabar el juego
+      this.timeSystem.resume();
+      this.karenSystem.start((msg: KarenMessage) => this.handleKarenMessage(msg));
+      this.eventsSystem.start((event: OfficeEvent) => this.handleOfficeEvent(event));
+      this.npcSystem.releaseCooldown();
     }
   }
 
@@ -810,10 +864,7 @@ export class OfficeScene extends Phaser.Scene {
       this.karenNpc.updateKarenLevel(this.gameState.karenometer);
     }
 
-    // Mostrar alerta como solicitó el usuario
-    alert(`${event.title}\n\n${event.message}`);
-
-    // También mostrar notificación en HUD
+    // Mostrar notificación en HUD (sin alert nativo)
     this.hudSystem.showNotification({
       title: `Becatín: ${event.title}`,
       text: event.message,
@@ -884,16 +935,33 @@ export class OfficeScene extends Phaser.Scene {
     // Audio
     this.audioSystem.playSuccess();
 
-    // UI Victoria
-    const { width, height } = this.cameras.main;
-    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.8)
-      .setScrollFactor(0).setDepth(2000);
-    this.add.text(width / 2, height / 2,
-      `🎉 ¡Sobreviviste!\nPuntaje: ${this.gameState.score}\n⭐ Nivel completado`,
-      { fontSize: '14px', color: '#00FF88', align: 'center' }
-    ).setOrigin(0.5).setScrollFactor(0).setDepth(2001);
+    // Boss fight en niveles específicos (viernes de cada semana)
+    const currentLevel = this.progressionSystem.getCurrentLevel();
+    const bossLevels: Record<number, number> = { 5: 3, 10: 4 }; // nivel → boss level
+    const bossLevel = bossLevels[currentLevel.id];
 
-    this.time.delayedCall(4000, () => this.scene.start('MenuScene'));
+    if (bossLevel) {
+      const { width, height } = this.cameras.main;
+      this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.8)
+        .setScrollFactor(0).setDepth(2000);
+      this.add.text(width / 2, height / 2,
+        `🔥 ¡BOSS FIGHT!\n${currentLevel.name}\nPrepárate...`,
+        { fontSize: '14px', color: '#FF4444', align: 'center' }
+      ).setOrigin(0.5).setScrollFactor(0).setDepth(2001);
+
+      this.time.delayedCall(2500, () => {
+        this.scene.start('BossScene', { bossLevel, returnScene: 'MenuScene' });
+      });
+      return;
+    }
+
+    // UI Victoria normal
+    // Transicionar a escena de victoria
+    this.scene.start('DayCompleteScene', {
+      score: this.gameState.score,
+      levelName: currentLevel.name,
+      nextLevelId: currentLevel.id + 1
+    });
   }
 
   private handleGameOver(reason: string): void {
@@ -909,15 +977,15 @@ export class OfficeScene extends Phaser.Scene {
 
     this.audioSystem.playGameOver();
 
-    const { width, height } = this.cameras.main;
-    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.8)
-      .setScrollFactor(0).setDepth(2000);
-    this.add.text(width / 2, height / 2,
-      `😿 Michi renunció...\nRazón: ${reason}\nPuntaje: ${this.gameState.score}`,
-      { fontSize: '14px', color: '#FF4444', align: 'center' }
-    ).setOrigin(0.5).setScrollFactor(0).setDepth(2001);
+    // Limpiar estado guardado
+    OfficeScene.savedTimeMinutes = -1;
+    OfficeScene.savedGameState = null;
 
-    this.time.delayedCall(4000, () => this.scene.start('MenuScene'));
+    // Transicionar a la escena de Game Over
+    this.scene.start('GameOverScene', {
+      reason,
+      score: this.gameState.score
+    });
   }
 
   private degradeStats(): void {
@@ -947,7 +1015,7 @@ export class OfficeScene extends Phaser.Scene {
   }
 
   private showFloatingText(x: number, y: number, text: string): void {
-    const ft = this.add.text(x, y, text, { fontSize: '10px', color: '#00FF88' })
+    const ft = this.add.text(x, y, text, { fontSize: '14px', color: '#00FF88' })
       .setOrigin(0.5).setDepth(500);
     this.tweens.add({ targets: ft, y: y - 30, alpha: 0, duration: 1500, onComplete: () => ft.destroy() });
   }
@@ -959,6 +1027,10 @@ export class OfficeScene extends Phaser.Scene {
       'git-branches': 'GitBranchesScene',
       'git-merge': 'GitMergeScene',
       'git-conflict': 'GitConflictScene',
+      'git-workflow': 'GitWorkflowScene',
+      'git-cherry-pick': 'GitCherryPickScene',
+      'git-rebase': 'GitRebaseScene',
+      'git-release': 'GitReleaseScene',
     };
     return minigameIds.map(id => map[id]).filter(Boolean);
   }
@@ -1034,26 +1106,85 @@ export class OfficeScene extends Phaser.Scene {
   }
 
   /**
-   * Sistema global de depth sorting para todos los personajes
-   * Regla profesional: mientras más abajo (mayor Y), mayor depth (se dibuja encima)
+   * Crea el área de comida (refrigerador/snacks)
    */
-  private updateGlobalDepthSorting(): void {
-    const baseDepth = 100;
+  private createFoodArea(x: number, y: number): void {
+    // Crear un sprite simple para la zona de comida (usando un tile genérico como base)
+    const foodSprite = this.add.sprite(x, y, 'office-tiles', 0);
+    foodSprite.setTint(0x88AA66);
+    this.officeObjects.push(foodSprite);
+
+    // Emoji de comida encima para identificar la zona
+    this.add.text(x, y - 10, '🍕', { fontSize: '20px' }).setOrigin(0.5);
+    this.add.text(x, y + 12, 'Snacks', { fontSize: '8px', color: '#AAFFAA' }).setOrigin(0.5);
+
+    // Zona de interacción
+    const zone = this.add.zone(x, y, 64, 64);
+    this.interactionZones.push({ zone, type: 'food' });
+  }
+
+  /**
+   * Crea la zona de descanso (sofá/break room)
+   */
+  private createRestArea(x: number, y: number): void {
+    const restSprite = this.add.sprite(x, y, 'office-tiles', 0);
+    restSprite.setTint(0x6666AA);
+    this.officeObjects.push(restSprite);
+
+    this.add.text(x, y - 10, '🛋️', { fontSize: '20px' }).setOrigin(0.5);
+    this.add.text(x, y + 12, 'Descanso', { fontSize: '8px', color: '#AAAAFF' }).setOrigin(0.5);
+
+    const zone = this.add.zone(x, y, 64, 64);
+    this.interactionZones.push({ zone, type: 'rest' });
+  }
+
+  /**
+   * Interacción: comer comida para reducir hambre
+   */
+  private eatFood(x: number, y: number): void {
+    const foods = [
+      { name: '🍕 Pizza', hunger: -30, energy: 15, happiness: 10 },
+      { name: '🍩 Dona', hunger: -15, energy: 5, happiness: 15 },
+      { name: '🥐 Concha', hunger: -20, energy: 10, happiness: 5 },
+      { name: '🌮 Taco', hunger: -25, energy: 10, happiness: 10 },
+      { name: '🍌 Plátano', hunger: -10, energy: 8, happiness: 3 },
+    ];
+
+    const food = foods[Math.floor(Math.random() * foods.length)];
     
-    // Lista de todos los sprites que deben tener depth sorting
-    const spritesToSort = [
-      this.michi,
-      this.michiNewsSprite,
-      this.karenNpc?.getSprite(),
-      this.becatinNpc?.getSprite()
-    ].filter(sprite => sprite && sprite.active);
-    
-    // Aplicar depth basado en posición Y
-    spritesToSort.forEach(sprite => {
-      if (sprite) {
-        const newDepth = baseDepth + Math.floor(sprite.y);
-        sprite.setDepth(newDepth);
-      }
-    });
+    this.gameState.hunger = Math.max(0, this.gameState.hunger + food.hunger);
+    this.gameState.energy = Math.min(100, this.gameState.energy + food.energy);
+    this.gameState.happiness = Math.min(100, this.gameState.happiness + food.happiness);
+    this.updateHud();
+    this.showFloatingText(x, y - 20, `+${food.name}`);
+    this.portraitSystem.setTemporaryEmotion('eating', 2000);
+    this.audioSystem.playSuccess();
+  }
+
+  /**
+   * Interacción: tomar un break para reducir estrés
+   */
+  private takeBreak(x: number, y: number): void {
+    const activities = [
+      { name: '🧘 Respirar profundo', stress: -20, energy: 5 },
+      { name: '📱 Ver memes', stress: -15, happiness: 10 },
+      { name: '🚶 Estirar piernas', stress: -10, energy: 10 },
+      { name: '🎵 Escuchar música', stress: -18, happiness: 8 },
+      { name: '😺 Ver videos de gatos', stress: -25, happiness: 15 },
+    ];
+
+    const activity = activities[Math.floor(Math.random() * activities.length)];
+
+    this.gameState.stress = Math.max(0, this.gameState.stress + activity.stress);
+    if ('energy' in activity) {
+      this.gameState.energy = Math.min(100, this.gameState.energy + (activity.energy || 0));
+    }
+    if ('happiness' in activity) {
+      this.gameState.happiness = Math.min(100, this.gameState.happiness + (activity.happiness || 0));
+    }
+    this.updateHud();
+    this.showFloatingText(x, y - 20, activity.name);
+    this.portraitSystem.setTemporaryEmotion('happy', 2000);
+    this.audioSystem.playSuccess();
   }
 }

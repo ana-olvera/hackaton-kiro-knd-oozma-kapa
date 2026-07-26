@@ -150,37 +150,37 @@ export class DialogueSystem {
 
     // Posición ajustada para zoom 2x (viewport = 400x300)
     const x = 200;
-    const y = 280;
+    const y = 270;
 
     this.container = this.scene.add.container(x, y);
     this.container.setScrollFactor(0);
     this.container.setDepth(1900);
 
     // Fondo estilo chat
-    const bg = this.scene.add.rectangle(0, 0, 180, 30, 0x111133, 0.95);
+    const bg = this.scene.add.rectangle(0, 0, 280, 50, 0x111133, 0.95);
     bg.setStrokeStyle(1, 0x333366);
 
     // Icono
-    const icon = this.scene.add.text(-82, -5, line.icon, { fontSize: '10px' });
+    const icon = this.scene.add.text(-125, -8, line.icon, { fontSize: '18px' });
 
     // Nombre del hablante
-    const speaker = this.scene.add.text(-65, -10, line.speaker, {
-      fontSize: '6px',
+    const speaker = this.scene.add.text(-100, -16, line.speaker, {
+      fontSize: '12px',
       color: line.speakerColor,
       fontStyle: 'bold'
     });
 
     // Texto
-    const text = this.scene.add.text(-65, 1, line.text, {
-      fontSize: '6px',
+    const text = this.scene.add.text(-100, 2, line.text, {
+      fontSize: '12px',
       color: '#FFFFFF',
-      wordWrap: { width: 140 }
+      wordWrap: { width: 210 }
     });
 
     // Indicador de progreso
-    const progress = this.scene.add.text(75, 8,
+    const progress = this.scene.add.text(120, 14,
       `${this.currentLineIndex + 1}/${this.currentSequence.lines.length}`,
-      { fontSize: '5px', color: '#666666' }
+      { fontSize: '10px', color: '#666666' }
     );
 
     this.container.add([bg, icon, speaker, text, progress]);

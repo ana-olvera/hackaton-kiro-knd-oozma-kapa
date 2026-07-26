@@ -92,44 +92,44 @@ export class GitConflictScene extends Phaser.Scene {
     this.add.rectangle(width / 2, height / 2, width, height, 0x1a1a2e);
 
     this.add.text(width / 2, 25, '💥 Merge Conflict: Resuelve el conflicto', {
-      fontSize: '15px', color: '#FF4444', fontStyle: 'bold'
+      fontSize: '20px', color: '#FF4444', fontStyle: 'bold'
     }).setOrigin(0.5);
 
     this.fileNameText = this.add.text(width / 2, 55, '', {
-      fontSize: '11px', color: '#AAAAAA'
+      fontSize: '14px', color: '#AAAAAA'
     }).setOrigin(0.5);
 
     // Conflict markers
     this.add.text(width / 2, 80, '<<<<<<< HEAD', {
-      fontSize: '9px', color: '#FF6666', fontFamily: 'monospace'
+      fontSize: '12px', color: '#FF6666', fontFamily: 'monospace'
     }).setOrigin(0.5);
 
     // HEAD box (izquierda)
     this.headBox = this.createCodeBox(width / 2 - 190, 160, 'HEAD (actual)', '#4488FF');
 
     this.add.text(width / 2, 240, '=======', {
-      fontSize: '9px', color: '#888888', fontFamily: 'monospace'
+      fontSize: '12px', color: '#888888', fontFamily: 'monospace'
     }).setOrigin(0.5);
 
     // Branch box (derecha)
     this.branchBox = this.createCodeBox(width / 2 + 190, 160, '', '#FF8844');
 
     this.add.text(width / 2, 270, '>>>>>>> branch', {
-      fontSize: '9px', color: '#FF6666', fontFamily: 'monospace'
+      fontSize: '12px', color: '#FF6666', fontFamily: 'monospace'
     }).setOrigin(0.5);
 
     // Botones de elección
-    const btnY = 340;
-    this.createChoiceButton(width / 2 - 200, btnY, '← Mantener HEAD', 'head', '#4488FF');
+    const btnY = 350;
+    this.createChoiceButton(width / 2 - 220, btnY, '← Mantener HEAD', 'head', '#4488FF');
     this.createChoiceButton(width / 2, btnY, '↔ Mantener Ambos', 'both', '#FFAA44');
-    this.createChoiceButton(width / 2 + 200, btnY, 'Mantener Branch →', 'branch', '#FF8844');
+    this.createChoiceButton(width / 2 + 220, btnY, 'Mantener Branch →', 'branch', '#FF8844');
 
-    this.feedbackText = this.add.text(width / 2, 420, '', {
-      fontSize: '11px', color: '#FFFFFF', wordWrap: { width: 500 }, align: 'center'
+    this.feedbackText = this.add.text(width / 2, 430, '', {
+      fontSize: '15px', color: '#FFFFFF', wordWrap: { width: 600 }, align: 'center'
     }).setOrigin(0.5);
 
     this.add.text(width / 2, height - 25, 'Elige qué versión conservar', {
-      fontSize: '9px', color: '#555555'
+      fontSize: '13px', color: '#555555'
     }).setOrigin(0.5);
 
     this.loadTask();
@@ -138,16 +138,16 @@ export class GitConflictScene extends Phaser.Scene {
 
   private createCodeBox(x: number, y: number, label: string, color: string): Phaser.GameObjects.Container {
     const container = this.add.container(x, y);
-    const bg = this.add.rectangle(0, 0, 320, 100, 0x0d0d22);
+    const bg = this.add.rectangle(0, 0, 340, 110, 0x0d0d22);
     bg.setStrokeStyle(2, Phaser.Display.Color.HexStringToColor(color).color);
 
-    const labelText = this.add.text(0, -55, label, {
-      fontSize: '9px', color: color
+    const labelText = this.add.text(0, -60, label, {
+      fontSize: '13px', color: color
     }).setOrigin(0.5);
 
     const codeText = this.add.text(0, 0, '', {
-      fontSize: '9px', color: '#CCCCCC', fontFamily: 'monospace',
-      wordWrap: { width: 290 }, align: 'left'
+      fontSize: '13px', color: '#CCCCCC', fontFamily: 'monospace',
+      wordWrap: { width: 310 }, align: 'left'
     }).setOrigin(0.5);
 
     container.add([bg, labelText, codeText]);
@@ -158,8 +158,8 @@ export class GitConflictScene extends Phaser.Scene {
 
   private createChoiceButton(x: number, y: number, text: string, choice: string, color: string): void {
     const btn = this.add.text(x, y, text, {
-      fontSize: '11px', color: color, backgroundColor: '#2d2d44',
-      padding: { x: 12, y: 8 }
+      fontSize: '15px', color: color, backgroundColor: '#2d2d44',
+      padding: { x: 14, y: 10 }
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
     btn.on('pointerover', () => btn.setStyle({ backgroundColor: '#3d3d55' }));

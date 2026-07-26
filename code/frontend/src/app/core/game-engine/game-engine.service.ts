@@ -3,11 +3,17 @@ import * as Phaser from 'phaser';
 import { OfficeScene } from '../../game/scenes/office.scene';
 import { MenuScene } from '../../game/scenes/menu.scene';
 import { BossScene } from '../../game/scenes/boss.scene';
+import { GameOverScene } from '../../game/scenes/game-over.scene';
+import { DayCompleteScene } from '../../game/scenes/day-complete.scene';
 import { GitBasicScene } from '../../game/minigames/git-basic/git-basic.scene';
 import { GitStagingScene } from '../../game/minigames/git-staging/git-staging.scene';
 import { GitBranchesScene } from '../../game/minigames/git-branches/git-branches.scene';
 import { GitMergeScene } from '../../game/minigames/git-merge/git-merge.scene';
 import { GitConflictScene } from '../../game/minigames/git-conflict/git-conflict.scene';
+import { GitWorkflowScene } from '../../game/minigames/git-workflow/git-workflow.scene';
+import { GitCherryPickScene } from '../../game/minigames/git-cherry-pick/git-cherry-pick.scene';
+import { GitRebaseScene } from '../../game/minigames/git-rebase/git-rebase.scene';
+import { GitReleaseScene } from '../../game/minigames/git-release/git-release.scene';
 import { HudScene } from '../../game/systems/hud-system';
 
 @Injectable({
@@ -54,7 +60,13 @@ export class GameEngineService {
         GitBranchesScene,
         GitMergeScene,
         GitConflictScene,
-        BossScene
+        GitWorkflowScene,
+        GitCherryPickScene,
+        GitRebaseScene,
+        GitReleaseScene,
+        BossScene,
+        GameOverScene,
+        DayCompleteScene
       ],
       scale: {
         mode: Phaser.Scale.RESIZE,

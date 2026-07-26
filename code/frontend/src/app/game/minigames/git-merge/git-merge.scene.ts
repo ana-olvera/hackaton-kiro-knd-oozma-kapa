@@ -50,39 +50,39 @@ export class GitMergeScene extends Phaser.Scene {
     this.add.rectangle(width / 2, height / 2, width, height, 0x1a1a2e);
 
     this.add.text(width / 2, 30, '🤝 Git Merge: ¿Aprobar o rechazar?', {
-      fontSize: '15px', color: '#00FF88', fontStyle: 'bold'
+      fontSize: '20px', color: '#00FF88', fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, 55, 'Decide si este merge es correcto o no', {
-      fontSize: '10px', color: '#AAAAAA'
+    this.add.text(width / 2, 58, 'Decide si este merge es correcto o no', {
+      fontSize: '14px', color: '#AAAAAA'
     }).setOrigin(0.5);
 
     // Visualización de merge
     this.sourceText = this.add.text(150, 200, '', {
-      fontSize: '14px', color: '#4488FF', fontFamily: 'monospace',
-      backgroundColor: '#1a1a3e', padding: { x: 10, y: 6 }
+      fontSize: '18px', color: '#4488FF', fontFamily: 'monospace',
+      backgroundColor: '#1a1a3e', padding: { x: 12, y: 8 }
     }).setOrigin(0.5);
 
     this.mergeArrow = this.add.graphics();
 
     this.targetText = this.add.text(650, 200, '', {
-      fontSize: '14px', color: '#00FF88', fontFamily: 'monospace',
-      backgroundColor: '#1a1a3e', padding: { x: 10, y: 6 }
+      fontSize: '18px', color: '#00FF88', fontFamily: 'monospace',
+      backgroundColor: '#1a1a3e', padding: { x: 12, y: 8 }
     }).setOrigin(0.5);
 
     this.taskText = this.add.text(width / 2, 280, '', {
-      fontSize: '12px', color: '#CCCCCC', align: 'center'
+      fontSize: '16px', color: '#CCCCCC', align: 'center'
     }).setOrigin(0.5);
 
     // Botones Aprobar / Rechazar
-    const approveBtn = this.add.text(width / 2 - 100, 370, '✓ Aprobar Merge', {
-      fontSize: '14px', color: '#00FF88', backgroundColor: '#003300',
-      padding: { x: 15, y: 10 }
+    const approveBtn = this.add.text(width / 2 - 120, 370, '✓ Aprobar Merge', {
+      fontSize: '18px', color: '#00FF88', backgroundColor: '#003300',
+      padding: { x: 20, y: 12 }
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
-    const rejectBtn = this.add.text(width / 2 + 100, 370, '✗ Rechazar Merge', {
-      fontSize: '14px', color: '#FF4444', backgroundColor: '#330000',
-      padding: { x: 15, y: 10 }
+    const rejectBtn = this.add.text(width / 2 + 120, 370, '✗ Rechazar Merge', {
+      fontSize: '18px', color: '#FF4444', backgroundColor: '#330000',
+      padding: { x: 20, y: 12 }
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
     approveBtn.on('pointerdown', () => this.answer(true));
@@ -94,7 +94,7 @@ export class GitMergeScene extends Phaser.Scene {
     rejectBtn.on('pointerout', () => rejectBtn.setStyle({ backgroundColor: '#330000' }));
 
     this.feedbackText = this.add.text(width / 2, 440, '', {
-      fontSize: '12px', color: '#FFFFFF'
+      fontSize: '16px', color: '#FFFFFF'
     }).setOrigin(0.5);
 
     this.add.text(width / 2, height - 30, '', { fontSize: '9px', color: '#666' }).setOrigin(0.5);

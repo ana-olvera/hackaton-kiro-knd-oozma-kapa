@@ -17,6 +17,7 @@ export interface LevelConfig {
 }
 
 const LEVELS: LevelConfig[] = [
+  // === Semana 1 ===
   {
     id: 1, name: 'Lunes - El Comienzo', description: 'Tu primer día. Sobrevive.',
     unlocked: true, completed: false, stars: 0,
@@ -42,10 +43,41 @@ const LEVELS: LevelConfig[] = [
     karenIntensity: 7, eventFrequency: 5, timeSpeed: 1.3
   },
   {
-    id: 5, name: 'Viernes - Deploy', description: 'Karen quiere deploy HOY.',
+    id: 5, name: 'Viernes - Conflictos', description: 'Todo explota. Resuelve conflictos.',
     unlocked: false, completed: false, stars: 0,
     minigames: ['git-basic', 'git-staging', 'git-branches', 'git-merge', 'git-conflict'],
-    karenIntensity: 10, eventFrequency: 8, timeSpeed: 1.5
+    karenIntensity: 8, eventFrequency: 6, timeSpeed: 1.4
+  },
+  // === Semana 2 ===
+  {
+    id: 6, name: 'Lunes S2 - Integración', description: 'Workflow completo de inicio a fin.',
+    unlocked: false, completed: false, stars: 0,
+    minigames: ['git-basic', 'git-staging', 'git-branches', 'git-merge', 'git-conflict', 'git-workflow'],
+    karenIntensity: 6, eventFrequency: 5, timeSpeed: 1.2
+  },
+  {
+    id: 7, name: 'Martes S2 - Cherry Pick', description: 'Elige commits con precisión quirúrgica.',
+    unlocked: false, completed: false, stars: 0,
+    minigames: ['git-basic', 'git-staging', 'git-branches', 'git-merge', 'git-conflict', 'git-workflow', 'git-cherry-pick'],
+    karenIntensity: 7, eventFrequency: 6, timeSpeed: 1.3
+  },
+  {
+    id: 8, name: 'Miércoles S2 - Rebase', description: 'Reorganiza la historia. Sin romper nada.',
+    unlocked: false, completed: false, stars: 0,
+    minigames: ['git-basic', 'git-staging', 'git-branches', 'git-merge', 'git-conflict', 'git-workflow', 'git-cherry-pick', 'git-rebase'],
+    karenIntensity: 8, eventFrequency: 7, timeSpeed: 1.4
+  },
+  {
+    id: 9, name: 'Jueves S2 - Release', description: 'Prepara el release. Todo debe estar perfecto.',
+    unlocked: false, completed: false, stars: 0,
+    minigames: ['git-basic', 'git-staging', 'git-branches', 'git-merge', 'git-conflict', 'git-workflow', 'git-cherry-pick', 'git-rebase', 'git-release'],
+    karenIntensity: 9, eventFrequency: 8, timeSpeed: 1.5
+  },
+  {
+    id: 10, name: 'Viernes S2 - Karen Final Boss', description: 'Deploy a producción. Karen al máximo.',
+    unlocked: false, completed: false, stars: 0,
+    minigames: ['git-basic', 'git-staging', 'git-branches', 'git-merge', 'git-conflict', 'git-workflow', 'git-cherry-pick', 'git-rebase', 'git-release'],
+    karenIntensity: 10, eventFrequency: 10, timeSpeed: 2.0
   },
 ];
 
@@ -92,6 +124,11 @@ export class ProgressionSystem {
     if (nextLevel && !nextLevel.unlocked) {
       nextLevel.unlocked = true;
       unlockedNext = true;
+    }
+
+    // Avanzar al siguiente nivel automáticamente
+    if (nextLevel) {
+      this.currentLevel = nextLevel.id;
     }
 
     this.saveToStorage();

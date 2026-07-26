@@ -55,14 +55,14 @@ export class KarenMessageBubble {
     
     // Configuración base adaptada al dispositivo
     this.config = {
-      bubbleWidth: this.isMobile ? 180 : 220,
-      bubbleHeight: this.isMobile ? 60 : 70,
-      fontSize: this.isMobile ? '10px' : '11px',
-      padding: this.isMobile ? 8 : 10,
+      bubbleWidth: this.isMobile ? 250 : 300,
+      bubbleHeight: this.isMobile ? 80 : 90,
+      fontSize: this.isMobile ? '15px' : '16px',
+      padding: this.isMobile ? 12 : 14,
       offsetX: 0,
-      offsetY: this.isMobile ? -80 : -90,   // Más arriba en móvil por controles
+      offsetY: this.isMobile ? -100 : -110,   // Más arriba en móvil por controles
       mobileScale: 1.1,                     // Escala ligeramente mayor en móvil
-      mobileFontSize: '10px'
+      mobileFontSize: '15px'
     };
   }
 
@@ -211,7 +211,7 @@ export class KarenMessageBubble {
     }
     
     const effectString = effects.join(' ');
-    const fontSize = this.isMobile ? '8px' : '9px';
+    const fontSize = this.isMobile ? '12px' : '13px';
     
     this.effectText = this.scene.add.text(
       0, -this.config.bubbleHeight/2 + 8, 

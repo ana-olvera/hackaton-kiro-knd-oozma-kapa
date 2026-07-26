@@ -21,6 +21,7 @@ interface StatBar {
 export class HudScene extends Phaser.Scene {
   private bars: Map<string, StatBar> = new Map();
   private clockText!: Phaser.GameObjects.Text;
+  private levelText!: Phaser.GameObjects.Text;
   private karenometerBg!: Phaser.GameObjects.Rectangle;
   private karenometerFill!: Phaser.GameObjects.Rectangle;
   private karenometerText!: Phaser.GameObjects.Text;
@@ -29,9 +30,9 @@ export class HudScene extends Phaser.Scene {
   private emotionLabel!: Phaser.GameObjects.Text;
   private mobileControls!: MobileControls;
 
-  private readonly BAR_WIDTH = 55;
-  private readonly BAR_HEIGHT = 7;
-  private readonly PADDING = 8;
+  private readonly BAR_WIDTH = 80;
+  private readonly BAR_HEIGHT = 10;
+  private readonly PADDING = 10;
 
   constructor() {
     super({ key: 'HudScene', active: false });
@@ -44,15 +45,21 @@ export class HudScene extends Phaser.Scene {
 
     // Fondo semi-transparente del HUD (esquina superior izquierda)
     const hudBg = this.add.rectangle(
-      this.PADDING - 2, this.PADDING - 2, 170, 165, 0x000000, 0.8
+      this.PADDING - 2, this.PADDING - 2, 220, 230, 0x000000, 0.8
     ).setOrigin(0, 0);
     hudBg.setStrokeStyle(1, 0x333366);
 
     // Reloj
-    this.clockText = this.add.text(this.PADDING + 2, this.PADDING + 2, '🕐 9:00 AM', {
-      fontSize: '12px',
+    this.clockText = this.add.text(this.PADDING + 4, this.PADDING + 4, '🕐 9:00 AM', {
+      fontSize: '16px',
       color: '#00FF88',
       fontStyle: 'bold'
+    });
+
+    // Nivel / Día de la semana
+    this.levelText = this.add.text(this.PADDING + 4, this.PADDING + 22, '📅 Lunes - Nivel 1', {
+      fontSize: '12px',
+      color: '#FFAA44'
     });
 
     // Barras de estado
@@ -65,26 +72,26 @@ export class HudScene extends Phaser.Scene {
       { key: 'stress', label: 'Estrés', icon: '😿', color: 0xFF0000, value: 10 },
     ];
 
-    let yOffset = this.PADDING + 20;
+    let yOffset = this.PADDING + 42;
     for (const stat of stats) {
       this.createStatBar(stat.key, stat.label, stat.icon, stat.color, stat.value, yOffset);
-      yOffset += 17;
+      yOffset += 22;
     }
 
     // Karenómetro
-    yOffset += 4;
-    this.karenometerText = this.add.text(this.PADDING + 2, yOffset, '😡 Karen: 0%', {
-      fontSize: '9px',
+    yOffset += 6;
+    this.karenometerText = this.add.text(this.PADDING + 4, yOffset, '😡 Karen: 0%', {
+      fontSize: '14px',
       color: '#FF6666'
     });
 
-    yOffset += 13;
+    yOffset += 18;
     this.karenometerBg = this.add.rectangle(
-      this.PADDING + 2, yOffset, this.BAR_WIDTH + 35, 8, 0x333333
+      this.PADDING + 4, yOffset, this.BAR_WIDTH + 50, 10, 0x333333
     ).setOrigin(0, 0);
 
     this.karenometerFill = this.add.rectangle(
-      this.PADDING + 2, yOffset, 0, 8, 0xFF0000
+      this.PADDING + 4, yOffset, 0, 10, 0xFF0000
     ).setOrigin(0, 0);
 
     // Retrato emocional (esquina superior derecha)
@@ -111,14 +118,17 @@ export class HudScene extends Phaser.Scene {
     }
 
     this.emotionLabel = this.add.text(portraitX, portraitY + portraitSize / 2 + 12, 'Feliz', {
-      fontSize: '9px',
+      fontSize: '12px',
       color: '#00FF88'
     }).setOrigin(0.5);
 
-    // Controles (esquina inferior)
-    this.add.text(400, 580, 'Flechas: mover | E: interactuar (💻 minijuego | ☕ café)', {
-      fontSize: '10px',
-      color: '#555555'
+    // Controles (parte baja, fijo en pantalla con fondo para contraste)
+    const controlsBg = this.add.rectangle(400, 585, 620, 28, 0x000000, 0.75).setOrigin(0.5);
+    controlsBg.setStrokeStyle(1, 0x444466);
+    this.add.text(400, 585, '⬆⬇⬅➡ Mover  |  E: Interactuar (💻 minijuego | ☕ café | 🍕 comida | 🛋️ descanso)', {
+      fontSize: '11px',
+      color: '#FFFFFF',
+      fontStyle: 'bold'
     }).setOrigin(0.5);
   }
 
@@ -126,24 +136,24 @@ export class HudScene extends Phaser.Scene {
     key: string, label: string, icon: string,
     color: number, value: number, y: number
   ): void {
-    const x = this.PADDING + 2;
+    const x = this.PADDING + 4;
 
     const labelText = this.add.text(x, y, `${icon} ${label}`, {
-      fontSize: '8px',
+      fontSize: '12px',
       color: '#CCCCCC'
     });
 
     const bgBar = this.add.rectangle(
-      x + 70, y + 2, this.BAR_WIDTH, this.BAR_HEIGHT, 0x333333
+      x + 90, y + 3, this.BAR_WIDTH, this.BAR_HEIGHT, 0x333333
     ).setOrigin(0, 0);
 
     const fillWidth = (value / 100) * this.BAR_WIDTH;
     const fillBar = this.add.rectangle(
-      x + 70, y + 2, fillWidth, this.BAR_HEIGHT, color
+      x + 90, y + 3, fillWidth, this.BAR_HEIGHT, color
     ).setOrigin(0, 0);
 
-    const valueText = this.add.text(x + 70 + this.BAR_WIDTH + 4, y, `${value}`, {
-      fontSize: '8px',
+    const valueText = this.add.text(x + 90 + this.BAR_WIDTH + 6, y, `${value}`, {
+      fontSize: '12px',
       color: '#AAAAAA'
     });
 
@@ -177,7 +187,7 @@ export class HudScene extends Phaser.Scene {
 
   updateKarenometer(value: number): void {
     const clamped = Math.max(0, Math.min(100, value));
-    const fillWidth = (clamped / 100) * (this.BAR_WIDTH + 35);
+    const fillWidth = (clamped / 100) * (this.BAR_WIDTH + 50);
     this.karenometerFill.width = fillWidth;
     this.karenometerText.setText(`😡 Karen: ${Math.round(clamped)}%`);
 
@@ -188,6 +198,12 @@ export class HudScene extends Phaser.Scene {
 
   updateClock(timeString: string): void {
     this.clockText.setText(`🕐 ${timeString}`);
+  }
+
+  updateLevel(levelName: string): void {
+    if (this.levelText) {
+      this.levelText.setText(`📅 ${levelName}`);
+    }
   }
 
   updatePortrait(emotion: string): void {
@@ -269,29 +285,29 @@ export class HudScene extends Phaser.Scene {
     container.setDepth(1500);
 
     const colorNum = Phaser.Display.Color.HexStringToColor(config.color).color;
-    const bg = this.add.rectangle(0, 0, 220, 55, 0x111133, 0.95);
+    const bg = this.add.rectangle(0, 0, 320, 80, 0x111133, 0.95);
     bg.setStrokeStyle(2, colorNum);
 
     const elements: Phaser.GameObjects.GameObject[] = [bg];
 
     if (config.icon) {
-      const icon = this.add.text(-95, -15, config.icon, { fontSize: '14px' });
+      const icon = this.add.text(-140, -22, config.icon, { fontSize: '20px' });
       elements.push(icon);
     }
 
-    const title = this.add.text(-75, -18, config.title, {
-      fontSize: '9px', color: config.color, fontStyle: 'bold'
+    const title = this.add.text(-110, -25, config.title, {
+      fontSize: '16px', color: config.color, fontStyle: 'bold'
     });
     elements.push(title);
 
-    const text = this.add.text(-95, 2, config.text, {
-      fontSize: '9px', color: '#FFFFFF', wordWrap: { width: 180 }
+    const text = this.add.text(-140, 4, config.text, {
+      fontSize: '15px', color: '#FFFFFF', wordWrap: { width: 260 }
     });
     elements.push(text);
 
     if (config.subtext) {
-      const sub = this.add.text(-95, 18, config.subtext, {
-        fontSize: '8px', color: '#FF4444'
+      const sub = this.add.text(-140, 28, config.subtext, {
+        fontSize: '13px', color: '#FF4444'
       });
       elements.push(sub);
     }
@@ -333,8 +349,18 @@ export class HudSystem {
 
   create(): void {
     // Lanzar HudScene como escena paralela sobre la actual
-    this.scene.scene.launch('HudScene');
-    this.hudScene = this.scene.scene.get('HudScene') as HudScene;
+    // Si ya existe y está dormida, despertarla; si no, lanzarla
+    const existingHud = this.scene.scene.get('HudScene');
+    if (existingHud && this.scene.scene.isActive('HudScene')) {
+      // Ya está activa, solo obtener referencia
+      this.hudScene = existingHud as HudScene;
+    } else if (existingHud && this.scene.scene.isSleeping('HudScene')) {
+      this.scene.scene.wake('HudScene');
+      this.hudScene = existingHud as HudScene;
+    } else {
+      this.scene.scene.launch('HudScene');
+      this.hudScene = this.scene.scene.get('HudScene') as HudScene;
+    }
   }
 
   updateStat(key: string, value: number): void {
@@ -347,6 +373,10 @@ export class HudSystem {
 
   updateClock(timeString: string): void {
     this.hudScene?.updateClock(timeString);
+  }
+
+  updateLevel(levelName: string): void {
+    this.hudScene?.updateLevel(levelName);
   }
 
   updatePortrait(emotion: string): void {
@@ -372,6 +402,7 @@ export class HudSystem {
   destroy(): void {
     if (this.hudScene) {
       this.scene.scene.stop('HudScene');
+      this.hudScene = null;
     }
   }
 }

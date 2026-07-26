@@ -130,6 +130,7 @@ export class EventsSystem {
   }
 
   start(onEvent: (event: OfficeEvent) => void): void {
+    this.stop(); // Limpiar timer previo para evitar duplicados
     this.onEventCallback = onEvent;
     this.scheduleNext();
   }

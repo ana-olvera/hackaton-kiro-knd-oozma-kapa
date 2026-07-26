@@ -4,6 +4,7 @@ import { OfficeScene } from '../../game/scenes/office.scene';
 import { MenuScene } from '../../game/scenes/menu.scene';
 import { BossScene } from '../../game/scenes/boss.scene';
 import { GameOverScene } from '../../game/scenes/game-over.scene';
+import { DayCompleteScene } from '../../game/scenes/day-complete.scene';
 import { GitBasicScene } from '../../game/minigames/git-basic/git-basic.scene';
 import { GitStagingScene } from '../../game/minigames/git-staging/git-staging.scene';
 import { GitBranchesScene } from '../../game/minigames/git-branches/git-branches.scene';
@@ -64,7 +65,8 @@ export class GameEngineService {
         GitRebaseScene,
         GitReleaseScene,
         BossScene,
-        GameOverScene
+        GameOverScene,
+        DayCompleteScene
       ],
       scale: {
         mode: Phaser.Scale.RESIZE,

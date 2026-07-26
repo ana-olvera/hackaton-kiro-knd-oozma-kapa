@@ -236,13 +236,13 @@ export class BecatinSprite {
   playAnimation(state: BecatinState, temporary: boolean = false): void {
     const animationKey = `becatin-${state}`;
     
-    if (this.sprite.anims.exists(animationKey)) {
+    // Verificar en el AnimationManager global (no en el sprite)
+    if (this.sprite.scene.anims.exists(animationKey)) {
       this.currentState = state;
       this.isTemporaryAnimation = temporary;
       this.sprite.anims.play(animationKey, true);
-    } else {
-      console.warn(`[BecatinSprite] Animación no encontrada: ${animationKey}`);
     }
+    // Sin log para evitar spam en consola
   }
 
   /**

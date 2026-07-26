@@ -13,15 +13,15 @@ import { Router } from '@angular/router';
         <button class="menu-btn play-btn" (click)="startGame()">
           ▶ Jugar
         </button>
-        <button class="menu-btn" disabled>
-          ⚙ Configuración
-        </button>
-        <button class="menu-btn" disabled>
+        <button class="menu-btn" (click)="openAchievements()">
           🏆 Logros
+        </button>
+        <button class="menu-btn" (click)="openSettings()">
+          ⚙ Configuración
         </button>
       </div>
 
-      <p class="version">v0.0.1 - MVP</p>
+      <p class="version">v0.1.0 MVP | Equipo Oozma Kapa</p>
     </div>
   `,
   styles: [`
@@ -66,15 +66,10 @@ import { Router } from '@angular/router';
       min-width: 250px;
     }
 
-    .menu-btn:hover:not(:disabled) {
+    .menu-btn:hover {
       background: #3d3d55;
       border-color: #00ff88;
       transform: scale(1.05);
-    }
-
-    .menu-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
     }
 
     .play-btn {
@@ -95,5 +90,13 @@ export class MainMenuComponent {
 
   startGame(): void {
     this.router.navigate(['/game']);
+  }
+
+  openAchievements(): void {
+    this.router.navigate(['/achievements']);
+  }
+
+  openSettings(): void {
+    this.router.navigate(['/settings']);
   }
 }

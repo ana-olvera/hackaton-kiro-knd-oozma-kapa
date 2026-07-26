@@ -2,7 +2,7 @@ import * as Phaser from 'phaser';
 
 /**
  * Minijuego Nivel 2: Staging Area
- * El jugador arrastra archivos al staging area antes de commitear.
+ * El jugador hace click en los archivos para agregarlos/quitarlos del staging area.
  * Algunos archivos NO deben subirse (node_modules, .env, logs).
  */
 
@@ -28,7 +28,6 @@ const FILES: FileItem[] = [
 export class GitStagingScene extends Phaser.Scene {
   private stagedFiles: string[] = [];
   private fileObjects: Phaser.GameObjects.Container[] = [];
-  private stagingZone!: Phaser.GameObjects.Rectangle;
   private feedbackText!: Phaser.GameObjects.Text;
   private scoreText!: Phaser.GameObjects.Text;
   private score = 0;
@@ -46,53 +45,53 @@ export class GitStagingScene extends Phaser.Scene {
   create(): void {
     const { width, height } = this.cameras.main;
     this.stagedFiles = [];
+    this.fileObjects = [];
     this.score = 0;
     this.mistakes = 0;
 
     this.add.rectangle(width / 2, height / 2, width, height, 0x1a1a2e);
 
     // Título
-    this.add.text(width / 2, 30, '📂 Git Staging: Selecciona qué archivos subir', {
-      fontSize: '15px', color: '#00FF88', fontStyle: 'bold'
+    this.add.text(width / 2, 25, '📂 Git Staging: Selecciona qué archivos subir', {
+      fontSize: '18px', color: '#00FF88', fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, 55, '⚠️ NO subas archivos sensibles o innecesarios', {
-      fontSize: '10px', color: '#FFAA44'
+    this.add.text(width / 2, 52, '⚠️ Haz clic para agregar/quitar. NO subas archivos sensibles.', {
+      fontSize: '13px', color: '#FFAA44'
     }).setOrigin(0.5);
 
-    // Zona de staging (derecha)
-    this.stagingZone = this.add.rectangle(width - 150, height / 2, 200, 350, 0x003300, 0.5);
-    this.stagingZone.setStrokeStyle(2, 0x00FF88);
-    this.add.text(width - 150, 85, '📦 Staging Area', {
-      fontSize: '11px', color: '#00FF88'
-    }).setOrigin(0.5);
-
-    // Archivos (izquierda) - shuffle
+    // Archivos en grid de 2 columnas
     const shuffled = this.shuffleArray([...FILES]);
-    const startX = 150;
-    const startY = 100;
+    const colWidth = 300;
+    const startY = 90;
+    const rowHeight = 48;
 
     shuffled.forEach((file, i) => {
-      const y = startY + i * 42;
-      const container = this.createFileItem(startX, y, file);
+      const col = i % 2;
+      const row = Math.floor(i / 2);
+      const x = width / 2 - colWidth / 2 + col * colWidth;
+      const y = startY + row * rowHeight;
+      const container = this.createFileItem(x, y, file);
       this.fileObjects.push(container);
     });
 
     // Feedback
-    this.feedbackText = this.add.text(width / 2, height - 60, '', {
-      fontSize: '11px', color: '#FFFFFF'
+    this.feedbackText = this.add.text(width / 2, height - 80, '', {
+      fontSize: '15px', color: '#FFFFFF'
     }).setOrigin(0.5);
 
-    this.scoreText = this.add.text(width / 2, height - 35, 'Correctos: 0 | Errores: 0', {
-      fontSize: '9px', color: '#888888'
+    this.scoreText = this.add.text(width / 2, height - 55, 'Correctos: 0 | Errores: 0', {
+      fontSize: '13px', color: '#888888'
     }).setOrigin(0.5);
 
     // Botón commit
-    const commitBtn = this.add.text(width - 150, height - 50, '✓ git commit', {
-      fontSize: '14px', color: '#00FF88', backgroundColor: '#2d2d44',
-      padding: { x: 15, y: 8 }
+    const commitBtn = this.add.text(width / 2, height - 25, '✓ git commit', {
+      fontSize: '18px', color: '#00FF88', backgroundColor: '#2d2d44',
+      padding: { x: 20, y: 10 }
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
+    commitBtn.on('pointerover', () => commitBtn.setStyle({ backgroundColor: '#3d3d55' }));
+    commitBtn.on('pointerout', () => commitBtn.setStyle({ backgroundColor: '#2d2d44' }));
     commitBtn.on('pointerdown', () => this.handleCommit());
 
     // ESC para salir
@@ -102,37 +101,29 @@ export class GitStagingScene extends Phaser.Scene {
   private createFileItem(x: number, y: number, file: FileItem): Phaser.GameObjects.Container {
     const container = this.add.container(x, y);
 
-    const bg = this.add.rectangle(0, 0, 220, 35, 0x2d2d44);
-    bg.setStrokeStyle(1, 0x444466);
-    bg.setInteractive({ useHandCursor: true, draggable: true });
+    const bg = this.add.rectangle(0, 0, 270, 40, 0x2d2d44);
+    bg.setStrokeStyle(2, 0x444466);
+    bg.setInteractive({ useHandCursor: true });
 
-    const text = this.add.text(-95, -6, `${file.icon} ${file.name}`, {
-      fontSize: '10px', color: '#CCCCCC'
+    const text = this.add.text(-120, -8, `${file.icon} ${file.name}`, {
+      fontSize: '14px', color: '#CCCCCC'
     });
 
     container.add([bg, text]);
     container.setData('file', file);
     container.setData('staged', false);
 
-    // Drag
-    this.input.setDraggable(bg);
-
-    bg.on('drag', (_pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
-      container.x = dragX;
-      container.y = dragY;
-    });
-
-    bg.on('dragend', () => {
-      // Verificar si cayó en staging zone
-      const bounds = this.stagingZone.getBounds();
-      if (bounds.contains(container.x, container.y)) {
-        this.stageFile(container, file);
-      } else {
-        this.unstageFile(container, file);
+    // Click para toggle stage/unstage
+    bg.on('pointerover', () => {
+      if (!container.getData('staged')) {
+        bg.setStrokeStyle(2, 0x00FF88);
       }
     });
-
-    // Click también funciona
+    bg.on('pointerout', () => {
+      if (!container.getData('staged')) {
+        bg.setStrokeStyle(2, 0x444466);
+      }
+    });
     bg.on('pointerdown', () => {
       const staged = container.getData('staged');
       if (!staged) {
@@ -155,12 +146,12 @@ export class GitStagingScene extends Phaser.Scene {
 
     if (file.shouldStage) {
       bg.setFillStyle(0x003300);
-      bg.setStrokeStyle(1, 0x00FF88);
+      bg.setStrokeStyle(2, 0x00FF88);
       this.score++;
-      this.feedbackText.setText(`✓ ${file.name} añadido`).setColor('#00FF88');
+      this.feedbackText.setText(`✓ ${file.name} añadido al staging`).setColor('#00FF88');
     } else {
       bg.setFillStyle(0x330000);
-      bg.setStrokeStyle(1, 0xFF4444);
+      bg.setStrokeStyle(2, 0xFF4444);
       this.mistakes++;
       this.feedbackText.setText(`⚠️ ¡${file.name} no debería subirse!`).setColor('#FF4444');
       this.cameras.main.shake(150, 0.003);
@@ -177,12 +168,13 @@ export class GitStagingScene extends Phaser.Scene {
 
     const bg = container.getAt(0) as Phaser.GameObjects.Rectangle;
     bg.setFillStyle(0x2d2d44);
-    bg.setStrokeStyle(1, 0x444466);
+    bg.setStrokeStyle(2, 0x444466);
 
     if (file.shouldStage) this.score--;
     else this.mistakes--;
 
     this.scoreText.setText(`Correctos: ${this.score} | Errores: ${this.mistakes}`);
+    this.feedbackText.setText(`↩ ${file.name} removido`).setColor('#AAAAAA');
   }
 
   private handleCommit(): void {
@@ -195,9 +187,9 @@ export class GitStagingScene extends Phaser.Scene {
       this.cameras.main.flash(400, 0, 200, 100);
       this.time.delayedCall(2000, () => this.exit(true));
     } else if (this.stagedFiles.length === 0) {
-      this.feedbackText.setText('❌ No hay archivos en staging.').setColor('#FF4444');
+      this.feedbackText.setText('❌ No hay archivos en staging. Haz clic en los archivos.').setColor('#FF4444');
     } else {
-      this.feedbackText.setText('⚠️ Revisa: faltan archivos o hay archivos que no van.').setColor('#FFAA44');
+      this.feedbackText.setText('⚠️ Revisa: faltan archivos correctos o hay archivos que no van.').setColor('#FFAA44');
     }
   }
 

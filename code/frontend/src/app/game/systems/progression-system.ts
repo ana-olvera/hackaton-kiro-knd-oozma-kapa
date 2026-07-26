@@ -126,6 +126,11 @@ export class ProgressionSystem {
       unlockedNext = true;
     }
 
+    // Avanzar al siguiente nivel automáticamente
+    if (nextLevel) {
+      this.currentLevel = nextLevel.id;
+    }
+
     this.saveToStorage();
     return { stars, unlockedNext };
   }

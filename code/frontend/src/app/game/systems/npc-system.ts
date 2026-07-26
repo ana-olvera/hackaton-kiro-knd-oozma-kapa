@@ -96,6 +96,7 @@ export class NpcSystem {
    * @param onChoiceNpc Callback para NPCs que requieren decisión (Michi News)
    */
   start(onEffect: (effect: NpcEffect, npcId: string) => void, onChoiceNpc?: () => void): void {
+    this.stop(); // Limpiar timer previo para evitar duplicados
     this.onEffectCallback = onEffect;
     this.onChoiceNpcCallback = onChoiceNpc || null;
     this.scheduleNext();

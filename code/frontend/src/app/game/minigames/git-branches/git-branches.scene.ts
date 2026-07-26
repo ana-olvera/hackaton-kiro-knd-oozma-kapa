@@ -62,13 +62,14 @@ export class GitBranchesScene extends Phaser.Scene {
     const { width, height } = this.cameras.main;
     this.currentTaskIndex = 0;
     this.score = 0;
+    this.branchButtons = [];
     this.tasks = this.shuffleArray([...TASKS]).slice(0, 4);
 
     this.add.rectangle(width / 2, height / 2, width, height, 0x1a1a2e);
 
     // Título
     this.add.text(width / 2, 30, '🌿 Git Branches: Elige el branch correcto', {
-      fontSize: '15px', color: '#00FF88', fontStyle: 'bold'
+      fontSize: '18px', color: '#00FF88', fontStyle: 'bold'
     }).setOrigin(0.5);
 
     // Visualización de árbol de branches
@@ -76,12 +77,12 @@ export class GitBranchesScene extends Phaser.Scene {
 
     // Tarea actual
     this.taskText = this.add.text(width / 2, 180, '', {
-      fontSize: '12px', color: '#FFFFFF', wordWrap: { width: 500 }, align: 'center'
+      fontSize: '15px', color: '#FFFFFF', wordWrap: { width: 500 }, align: 'center'
     }).setOrigin(0.5);
 
     // Pregunta
     this.add.text(width / 2, 220, '¿A qué branch debes hacer checkout?', {
-      fontSize: '10px', color: '#AAAAAA'
+      fontSize: '14px', color: '#AAAAAA'
     }).setOrigin(0.5);
 
     // Botones de opciones
@@ -89,11 +90,11 @@ export class GitBranchesScene extends Phaser.Scene {
 
     // Feedback
     this.feedbackText = this.add.text(width / 2, height - 70, '', {
-      fontSize: '12px', color: '#FFFFFF'
+      fontSize: '15px', color: '#FFFFFF'
     }).setOrigin(0.5);
 
     this.progressText = this.add.text(width / 2, height - 40, '', {
-      fontSize: '9px', color: '#888888'
+      fontSize: '13px', color: '#888888'
     }).setOrigin(0.5);
 
     // Cargar primera tarea
@@ -108,18 +109,18 @@ export class GitBranchesScene extends Phaser.Scene {
 
     // main branch (línea horizontal)
     graphics.lineBetween(x - 200, y, x + 200, y);
-    this.add.text(x + 210, y - 8, 'main', { fontSize: '9px', color: '#00FF88' });
+    this.add.text(x + 210, y - 8, 'main', { fontSize: '11px', color: '#00FF88' });
 
     // feature branch
     graphics.lineStyle(2, 0x4488FF);
     graphics.lineBetween(x - 100, y, x - 50, y - 30);
     graphics.lineBetween(x - 50, y - 30, x + 50, y - 30);
-    this.add.text(x + 55, y - 38, 'feature/*', { fontSize: '8px', color: '#4488FF' });
+    this.add.text(x + 55, y - 38, 'feature/*', { fontSize: '10px', color: '#4488FF' });
 
     // hotfix branch
     graphics.lineStyle(2, 0xFF4444);
     graphics.lineBetween(x + 50, y, x + 100, y + 30);
-    this.add.text(x + 105, y + 22, 'hotfix/*', { fontSize: '8px', color: '#FF4444' });
+    this.add.text(x + 105, y + 22, 'hotfix/*', { fontSize: '10px', color: '#FF4444' });
 
     // dots en main
     [x - 200, x - 100, x, x + 50, x + 200].forEach(px => {
@@ -138,7 +139,7 @@ export class GitBranchesScene extends Phaser.Scene {
       bg.setInteractive({ useHandCursor: true });
 
       const text = this.add.text(0, 0, '', {
-        fontSize: '12px', color: '#CCCCFF', fontFamily: 'monospace'
+        fontSize: '14px', color: '#CCCCFF', fontFamily: 'monospace'
       }).setOrigin(0.5);
 
       container.add([bg, text]);

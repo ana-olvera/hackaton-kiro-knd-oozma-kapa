@@ -94,7 +94,7 @@ export class OfficeScene extends Phaser.Scene {
   // Minijuegos disponibles según nivel
   private availableMinigames: string[] = ['GitBasicScene'];
 
-  // Mapa renovado de la oficina cyberpunk con más espacio: 0=piso, 1=pared, 6=escritorio_personalizado, 7=cafetera, 8=comida
+  // Mapa renovado de la oficina cyberpunk con más espacio: 0=piso, 1=pared, 6=escritorio_personalizado, 7=cafetera, 8=comida, 9=descanso
   private officeMap: number[][] = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -110,7 +110,7 @@ export class OfficeScene extends Phaser.Scene {
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // Genérico 1 (col 12)
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // Zona descanso (col 12)
     [1, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 1], // Comida (col 4), Cafetera (col 20)
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -220,6 +220,9 @@ export class OfficeScene extends Phaser.Scene {
         } else if (tileIndex === 8) {
           // Zona de comida
           this.createFoodArea(x, y);
+        } else if (tileIndex === 9) {
+          // Zona de descanso
+          this.createRestArea(x, y);
         }
       }
     }
@@ -552,6 +555,7 @@ export class OfficeScene extends Phaser.Scene {
         if (type === 'coffee') this.collectCoffee(zone.x, zone.y);
         else if (type === 'computer') this.startMinigame();
         else if (type === 'food') this.eatFood(zone.x, zone.y);
+        else if (type === 'rest') this.takeBreak(zone.x, zone.y);
         break;
       }
     }
@@ -665,24 +669,22 @@ export class OfficeScene extends Phaser.Scene {
    * Muestra el diálogo interactivo de Michi News con opciones de elección.
    */
   private showMichiNewsDialog(): void {
-    console.log('[OfficeScene] showMichiNewsDialog() llamado');
-    
     // Pausar sistemas mientras se muestra el diálogo
-    console.log('[OfficeScene] Pausando sistemas del juego');
     this.timeSystem.pause();
     this.karenSystem.stop();
     this.eventsSystem.stop();
 
     // Mostrar diálogo con elección
-    console.log('[OfficeScene] Llamando a choiceDialogSystem.show()');
     const success = this.choiceDialogSystem.show((effects, choiceText) => {
       this.handleMichiNewsChoice(effects, choiceText);
     });
     
-    if (success) {
-      console.log('[OfficeScene] Diálogo de Michi News mostrado exitosamente');
-    } else {
-      console.error('[OfficeScene] Fallo al mostrar diálogo de Michi News');
+    if (!success) {
+      // Si falló, reanudar sistemas inmediatamente para no trabar el juego
+      this.timeSystem.resume();
+      this.karenSystem.start((msg: KarenMessage) => this.handleKarenMessage(msg));
+      this.eventsSystem.start((event: OfficeEvent) => this.handleOfficeEvent(event));
+      this.npcSystem.releaseCooldown();
     }
   }
 
@@ -888,15 +890,12 @@ export class OfficeScene extends Phaser.Scene {
     }
 
     // UI Victoria normal
-    const { width, height } = this.cameras.main;
-    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.8)
-      .setScrollFactor(0).setDepth(2000);
-    this.add.text(width / 2, height / 2,
-      `🎉 ¡Sobreviviste!\nPuntaje: ${this.gameState.score}\n⭐ Nivel completado`,
-      { fontSize: '14px', color: '#00FF88', align: 'center' }
-    ).setOrigin(0.5).setScrollFactor(0).setDepth(2001);
-
-    this.time.delayedCall(4000, () => this.scene.start('MenuScene'));
+    // Transicionar a escena de victoria
+    this.scene.start('DayCompleteScene', {
+      score: this.gameState.score,
+      levelName: currentLevel.name,
+      nextLevelId: currentLevel.id + 1
+    });
   }
 
   private handleGameOver(reason: string): void {
@@ -1059,6 +1058,21 @@ export class OfficeScene extends Phaser.Scene {
   }
 
   /**
+   * Crea la zona de descanso (sofá/break room)
+   */
+  private createRestArea(x: number, y: number): void {
+    const restSprite = this.add.sprite(x, y, 'office-tiles', 0);
+    restSprite.setTint(0x6666AA);
+    this.officeObjects.push(restSprite);
+
+    this.add.text(x, y - 10, '🛋️', { fontSize: '20px' }).setOrigin(0.5);
+    this.add.text(x, y + 12, 'Descanso', { fontSize: '8px', color: '#AAAAFF' }).setOrigin(0.5);
+
+    const zone = this.add.zone(x, y, 64, 64);
+    this.interactionZones.push({ zone, type: 'rest' });
+  }
+
+  /**
    * Interacción: comer comida para reducir hambre
    */
   private eatFood(x: number, y: number): void {
@@ -1078,6 +1092,33 @@ export class OfficeScene extends Phaser.Scene {
     this.updateHud();
     this.showFloatingText(x, y - 20, `+${food.name}`);
     this.portraitSystem.setTemporaryEmotion('eating', 2000);
+    this.audioSystem.playSuccess();
+  }
+
+  /**
+   * Interacción: tomar un break para reducir estrés
+   */
+  private takeBreak(x: number, y: number): void {
+    const activities = [
+      { name: '🧘 Respirar profundo', stress: -20, energy: 5 },
+      { name: '📱 Ver memes', stress: -15, happiness: 10 },
+      { name: '🚶 Estirar piernas', stress: -10, energy: 10 },
+      { name: '🎵 Escuchar música', stress: -18, happiness: 8 },
+      { name: '😺 Ver videos de gatos', stress: -25, happiness: 15 },
+    ];
+
+    const activity = activities[Math.floor(Math.random() * activities.length)];
+
+    this.gameState.stress = Math.max(0, this.gameState.stress + activity.stress);
+    if ('energy' in activity) {
+      this.gameState.energy = Math.min(100, this.gameState.energy + (activity.energy || 0));
+    }
+    if ('happiness' in activity) {
+      this.gameState.happiness = Math.min(100, this.gameState.happiness + (activity.happiness || 0));
+    }
+    this.updateHud();
+    this.showFloatingText(x, y - 20, activity.name);
+    this.portraitSystem.setTemporaryEmotion('happy', 2000);
     this.audioSystem.playSuccess();
   }
 }

@@ -123,10 +123,10 @@ export class HudScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // Controles (parte baja, fijo en pantalla con fondo para contraste)
-    const controlsBg = this.add.rectangle(400, 585, 560, 28, 0x000000, 0.75).setOrigin(0.5);
+    const controlsBg = this.add.rectangle(400, 585, 620, 28, 0x000000, 0.75).setOrigin(0.5);
     controlsBg.setStrokeStyle(1, 0x444466);
-    this.add.text(400, 585, '⬆⬇⬅➡ Mover  |  E: Interactuar (💻 minijuego | ☕ café | 🍕 comida)', {
-      fontSize: '13px',
+    this.add.text(400, 585, '⬆⬇⬅➡ Mover  |  E: Interactuar (💻 minijuego | ☕ café | 🍕 comida | 🛋️ descanso)', {
+      fontSize: '11px',
       color: '#FFFFFF',
       fontStyle: 'bold'
     }).setOrigin(0.5);

@@ -818,7 +818,27 @@ export class OfficeScene extends Phaser.Scene {
     // Audio
     this.audioSystem.playSuccess();
 
-    // UI Victoria
+    // Boss fight en niveles específicos (viernes de cada semana)
+    const currentLevel = this.progressionSystem.getCurrentLevel();
+    const bossLevels: Record<number, number> = { 5: 3, 10: 4 }; // nivel → boss level
+    const bossLevel = bossLevels[currentLevel.id];
+
+    if (bossLevel) {
+      const { width, height } = this.cameras.main;
+      this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.8)
+        .setScrollFactor(0).setDepth(2000);
+      this.add.text(width / 2, height / 2,
+        `🔥 ¡BOSS FIGHT!\n${currentLevel.name}\nPrepárate...`,
+        { fontSize: '14px', color: '#FF4444', align: 'center' }
+      ).setOrigin(0.5).setScrollFactor(0).setDepth(2001);
+
+      this.time.delayedCall(2500, () => {
+        this.scene.start('BossScene', { bossLevel, returnScene: 'MenuScene' });
+      });
+      return;
+    }
+
+    // UI Victoria normal
     const { width, height } = this.cameras.main;
     this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.8)
       .setScrollFactor(0).setDepth(2000);
@@ -881,7 +901,7 @@ export class OfficeScene extends Phaser.Scene {
   }
 
   private showFloatingText(x: number, y: number, text: string): void {
-    const ft = this.add.text(x, y, text, { fontSize: '10px', color: '#00FF88' })
+    const ft = this.add.text(x, y, text, { fontSize: '14px', color: '#00FF88' })
       .setOrigin(0.5).setDepth(500);
     this.tweens.add({ targets: ft, y: y - 30, alpha: 0, duration: 1500, onComplete: () => ft.destroy() });
   }
@@ -893,6 +913,10 @@ export class OfficeScene extends Phaser.Scene {
       'git-branches': 'GitBranchesScene',
       'git-merge': 'GitMergeScene',
       'git-conflict': 'GitConflictScene',
+      'git-workflow': 'GitWorkflowScene',
+      'git-cherry-pick': 'GitCherryPickScene',
+      'git-rebase': 'GitRebaseScene',
+      'git-release': 'GitReleaseScene',
     };
     return minigameIds.map(id => map[id]).filter(Boolean);
   }

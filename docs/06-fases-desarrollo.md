@@ -56,6 +56,32 @@
 
 ---
 
+## Fase 4: Niveles Avanzados ✅ COMPLETADA
+
+### Tareas
+- [x] Sistema de progresión ampliado a 10 niveles (2 semanas laborales)
+- [x] Minijuego Git Workflow (nivel 6): flujo completo con todos los comandos
+- [x] Minijuego Git Cherry Pick (nivel 7): selección visual de commits
+- [x] Minijuego Git Rebase (nivel 8): puzzle de reordenamiento + decisiones
+- [x] Minijuego Git Release (nivel 9): checklist interactivo bajo presión
+- [x] Karen Final Boss (nivel 10): 10 preguntas, timer agresivo, todos los conceptos
+- [x] Integración de escenas nuevas en GameEngine
+- [x] Mapeo de minijuegos en OfficeScene
+- [x] Boss fights automáticos al completar niveles 5 y 10 (viernes)
+
+### Implementación Técnica Fase 4
+
+| Sistema | Archivo | Descripción |
+|---------|---------|-------------|
+| Workflow | `minigames/git-workflow/git-workflow.scene.ts` | 3 escenarios, timer 60s, todos los comandos |
+| Cherry Pick | `minigames/git-cherry-pick/git-cherry-pick.scene.ts` | Árbol visual de commits, 4 rondas |
+| Rebase | `minigames/git-rebase/git-rebase.scene.ts` | Drag & drop + decisiones, 4 rondas |
+| Release | `minigames/git-release/git-release.scene.ts` | Checklist obligatorio/bonus, Karen presiona |
+| Boss Nivel 4 | `scenes/boss.scene.ts` | 10 preguntas, 3.5-4.5s timer, conceptos avanzados |
+| Progresión | `systems/progression-system.ts` | 10 niveles, dificultad 2x en nivel 10 |
+
+---
+
 ## Resumen del Proyecto Completo
 
 ### Frontend (Angular 17 + Phaser.js)
@@ -104,7 +130,7 @@ src/
 └── main.ts
 ```
 
-### Escenas del Juego (9 total)
+### Escenas del Juego (13 total)
 | Escena | Propósito |
 |--------|-----------|
 | MenuScene | Menú principal con splash art |
@@ -115,17 +141,21 @@ src/
 | GitBranchesScene | Minijuego: elegir branch |
 | GitMergeScene | Minijuego: aprobar/rechazar merge |
 | GitConflictScene | Minijuego: resolver conflictos |
-| BossScene | Jefes finales (3 niveles) |
+| GitWorkflowScene | Minijuego: workflow completo |
+| GitCherryPickScene | Minijuego: cherry-pick visual |
+| GitRebaseScene | Minijuego: rebase y reordenar commits |
+| GitReleaseScene | Minijuego: checklist de release |
+| BossScene | Jefes finales (4 niveles) |
 
 ### Estadísticas
 - **14 sistemas** de juego integrados
-- **5 minijuegos** de Git
-- **3 jefes finales**
+- **9 minijuegos** de Git
+- **4 jefes finales**
 - **14 logros** rastreables
 - **9 skins** desbloqueables
 - **13 eventos** aleatorios
 - **7 secuencias** de diálogo
-- **5 niveles** de progresión
+- **10 niveles** de progresión (2 semanas)
 - **3 personajes** NPC
 - **2 idiomas** (ES/EN)
 - **8 efectos** de sonido

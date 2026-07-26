@@ -80,7 +80,7 @@ export class GitBasicScene extends Phaser.Scene {
     this.karenPortrait.setScale(1.5);
 
     this.karenText = this.add.text(120, height - 100, '"Sube el cambio, Michi."', {
-      fontSize: '11px',
+      fontSize: '14px',
       color: '#FF6B6B',
       fontStyle: 'italic',
       wordWrap: { width: 300 }

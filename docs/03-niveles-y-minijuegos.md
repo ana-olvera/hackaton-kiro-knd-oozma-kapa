@@ -69,11 +69,7 @@ Karen dice: "Sube el cambio."
 ### Nivel 4: Conflictos Sencillos
 
 ```
-<<<<<<< HEAD
-Hola
-=======
 Hola Mundo
->>>>>>> feature
 ```
 
 Opciones:

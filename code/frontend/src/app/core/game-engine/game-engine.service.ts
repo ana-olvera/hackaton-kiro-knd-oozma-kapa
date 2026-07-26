@@ -8,6 +8,10 @@ import { GitStagingScene } from '../../game/minigames/git-staging/git-staging.sc
 import { GitBranchesScene } from '../../game/minigames/git-branches/git-branches.scene';
 import { GitMergeScene } from '../../game/minigames/git-merge/git-merge.scene';
 import { GitConflictScene } from '../../game/minigames/git-conflict/git-conflict.scene';
+import { GitWorkflowScene } from '../../game/minigames/git-workflow/git-workflow.scene';
+import { GitCherryPickScene } from '../../game/minigames/git-cherry-pick/git-cherry-pick.scene';
+import { GitRebaseScene } from '../../game/minigames/git-rebase/git-rebase.scene';
+import { GitReleaseScene } from '../../game/minigames/git-release/git-release.scene';
 import { HudScene } from '../../game/systems/hud-system';
 
 @Injectable({
@@ -54,6 +58,10 @@ export class GameEngineService {
         GitBranchesScene,
         GitMergeScene,
         GitConflictScene,
+        GitWorkflowScene,
+        GitCherryPickScene,
+        GitRebaseScene,
+        GitReleaseScene,
         BossScene
       ],
       scale: {

@@ -47,6 +47,21 @@ const BOSS_LEVELS: Record<number, { name: string; challenges: BossChallenge[] }>
       { type: 'speed', question: 'Último paso antes de deploy:', options: ['Rezar', 'Correr tests', 'Avisar al equipo', 'Los tres anteriores'], correctIndex: 3, timeLimit: 5000 },
       { type: 'git', question: '¿Qué hace git cherry-pick?', options: ['Aplica un commit específico', 'Elige la mejor rama', 'Borra commits malos', 'Crea un tag'], correctIndex: 0, timeLimit: 7000 },
     ]
+  },
+  4: {
+    name: 'Karen Final Boss',
+    challenges: [
+      { type: 'git', question: '¿Cómo aplicar un commit específico de otra rama?', options: ['git cherry-pick <hash>', 'git merge <hash>', 'git apply <hash>', 'git copy <hash>'], correctIndex: 0, timeLimit: 4000 },
+      { type: 'speed', question: 'VPN se cayó. ¿Qué NO puedes hacer?', options: ['git push', 'git commit', 'git add', 'git log'], correctIndex: 0, timeLimit: 3500 },
+      { type: 'decision', question: 'Becatín rompió main con un force push. ¿Primero?', options: ['git reflog + reset', 'Gritar', 'Renunciar', 'Culpar a Karen'], correctIndex: 0, timeLimit: 4000 },
+      { type: 'git', question: '¿Qué hace git rebase -i HEAD~3?', options: ['Rebase interactivo de últimos 3 commits', 'Borra 3 commits', 'Crea 3 ramas', 'Merge 3 branches'], correctIndex: 0, timeLimit: 4000 },
+      { type: 'speed', question: 'Karen: "Deploy. Ahora." Pero tests fallan:', options: ['Nunca deploy sin tests verdes', 'Hacerlo igual', 'Skip tests con --no-verify', 'Decir que ya está'], correctIndex: 0, timeLimit: 3500 },
+      { type: 'git', question: '¿Diferencia entre git reset y git revert?', options: ['Reset reescribe historia, revert crea commit nuevo', 'Son iguales', 'Revert es más rápido', 'Reset es más seguro'], correctIndex: 0, timeLimit: 4000 },
+      { type: 'decision', question: 'Release tag incorrecto en producción. ¿Qué haces?', options: ['git tag -d + push --delete + retag', 'Ignorar', 'Nuevo release con otro nombre', 'Rollback completo'], correctIndex: 0, timeLimit: 4500 },
+      { type: 'speed', question: '¿Qué es un squash merge?', options: ['Combinar todos los commits de PR en uno', 'Borrar una rama', 'Merge forzado', 'Rebase automático'], correctIndex: 0, timeLimit: 3500 },
+      { type: 'decision', question: 'Cliente pide feature, Karen pide hotfix, QA pide tests:', options: ['Negociar prioridades con datos', 'Hacer todo a la vez', 'Solo lo de Karen', 'Ignorar a todos'], correctIndex: 0, timeLimit: 4000 },
+      { type: 'git', question: '¿Cómo ver qué archivos cambiaron entre 2 commits?', options: ['git diff --stat hash1 hash2', 'git log hash1 hash2', 'git show hash1..hash2', 'git compare hash1 hash2'], correctIndex: 0, timeLimit: 4000 },
+    ]
   }
 };
 

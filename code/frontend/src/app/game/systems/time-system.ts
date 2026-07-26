@@ -63,6 +63,11 @@ export class TimeSystem {
     return this.currentMinutes;
   }
 
+  setCurrentMinutes(minutes: number): void {
+    this.currentMinutes = Math.max(0, Math.min(this.totalMinutes - 1, minutes));
+    this.lastHour = this.getHour();
+  }
+
   getTimeString(): string {
     const totalMinutesFromMidnight = this.currentMinutes + 9 * 60; // Offset 9AM
     const hours = Math.floor(totalMinutesFromMidnight / 60);
@@ -78,6 +83,18 @@ export class TimeSystem {
 
   getHour(): number {
     return Math.floor((this.currentMinutes + 9 * 60) / 60);
+  }
+
+  /**
+   * Agrega tiempo bonus al día (retrocede el reloj).
+   * Útil como recompensa por completar minijuegos exitosamente.
+   */
+  addBonusTime(minutes: number): void {
+    this.currentMinutes = Math.max(0, this.currentMinutes - minutes);
+    // Actualizar el HUD con la nueva hora
+    if (this.onTickCallback) {
+      this.onTickCallback(this.currentMinutes, this.getTimeString());
+    }
   }
 
   private tick(): void {

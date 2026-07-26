@@ -21,6 +21,7 @@ interface StatBar {
 export class HudScene extends Phaser.Scene {
   private bars: Map<string, StatBar> = new Map();
   private clockText!: Phaser.GameObjects.Text;
+  private levelText!: Phaser.GameObjects.Text;
   private karenometerBg!: Phaser.GameObjects.Rectangle;
   private karenometerFill!: Phaser.GameObjects.Rectangle;
   private karenometerText!: Phaser.GameObjects.Text;
@@ -44,7 +45,7 @@ export class HudScene extends Phaser.Scene {
 
     // Fondo semi-transparente del HUD (esquina superior izquierda)
     const hudBg = this.add.rectangle(
-      this.PADDING - 2, this.PADDING - 2, 220, 210, 0x000000, 0.8
+      this.PADDING - 2, this.PADDING - 2, 220, 230, 0x000000, 0.8
     ).setOrigin(0, 0);
     hudBg.setStrokeStyle(1, 0x333366);
 
@@ -53,6 +54,12 @@ export class HudScene extends Phaser.Scene {
       fontSize: '16px',
       color: '#00FF88',
       fontStyle: 'bold'
+    });
+
+    // Nivel / Día de la semana
+    this.levelText = this.add.text(this.PADDING + 4, this.PADDING + 22, '📅 Lunes - Nivel 1', {
+      fontSize: '12px',
+      color: '#FFAA44'
     });
 
     // Barras de estado
@@ -65,7 +72,7 @@ export class HudScene extends Phaser.Scene {
       { key: 'stress', label: 'Estrés', icon: '😿', color: 0xFF0000, value: 10 },
     ];
 
-    let yOffset = this.PADDING + 26;
+    let yOffset = this.PADDING + 42;
     for (const stat of stats) {
       this.createStatBar(stat.key, stat.label, stat.icon, stat.color, stat.value, yOffset);
       yOffset += 22;
@@ -191,6 +198,12 @@ export class HudScene extends Phaser.Scene {
 
   updateClock(timeString: string): void {
     this.clockText.setText(`🕐 ${timeString}`);
+  }
+
+  updateLevel(levelName: string): void {
+    if (this.levelText) {
+      this.levelText.setText(`📅 ${levelName}`);
+    }
   }
 
   updatePortrait(emotion: string): void {
@@ -336,8 +349,18 @@ export class HudSystem {
 
   create(): void {
     // Lanzar HudScene como escena paralela sobre la actual
-    this.scene.scene.launch('HudScene');
-    this.hudScene = this.scene.scene.get('HudScene') as HudScene;
+    // Si ya existe y está dormida, despertarla; si no, lanzarla
+    const existingHud = this.scene.scene.get('HudScene');
+    if (existingHud && this.scene.scene.isActive('HudScene')) {
+      // Ya está activa, solo obtener referencia
+      this.hudScene = existingHud as HudScene;
+    } else if (existingHud && this.scene.scene.isSleeping('HudScene')) {
+      this.scene.scene.wake('HudScene');
+      this.hudScene = existingHud as HudScene;
+    } else {
+      this.scene.scene.launch('HudScene');
+      this.hudScene = this.scene.scene.get('HudScene') as HudScene;
+    }
   }
 
   updateStat(key: string, value: number): void {
@@ -350,6 +373,10 @@ export class HudSystem {
 
   updateClock(timeString: string): void {
     this.hudScene?.updateClock(timeString);
+  }
+
+  updateLevel(levelName: string): void {
+    this.hudScene?.updateLevel(levelName);
   }
 
   updatePortrait(emotion: string): void {
@@ -375,6 +402,7 @@ export class HudSystem {
   destroy(): void {
     if (this.hudScene) {
       this.scene.scene.stop('HudScene');
+      this.hudScene = null;
     }
   }
 }

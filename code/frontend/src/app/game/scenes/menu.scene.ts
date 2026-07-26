@@ -74,6 +74,7 @@ export class MenuScene extends Phaser.Scene {
       '   E     Interactuar',
       '   💻    Minijuegos de Git',
       '   ☕    Café = Energía',
+      '   🍕    Comida = Reduce hambre',
     ].join('\n'), {
       fontSize: '14px',
       color: '#dad5d5ff',

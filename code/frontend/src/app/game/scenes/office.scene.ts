@@ -55,6 +55,10 @@ export class OfficeScene extends Phaser.Scene {
   private choiceDialogSystem!: ChoiceDialogSystem; // Sistema para Michi News interactivo
 
   // Estado del juego
+  // Estado guardado entre transiciones de escena (sobrevive a scene.start)
+  private static savedTimeMinutes: number = -1;
+  private static savedGameState: any = null;
+
   private gameState = {
     energy: 80,
     coffee: 50,
@@ -63,7 +67,7 @@ export class OfficeScene extends Phaser.Scene {
     focus: 70,
     stress: 10,
     karenometer: 0,
-    happiness: 50, // Felicidad del personaje
+    happiness: 50,
     score: 0,
     coffeesToday: 0,
     minigamesCompleted: [] as string[],
@@ -120,17 +124,26 @@ export class OfficeScene extends Phaser.Scene {
   }
 
   init(data?: { fromMinigame?: boolean; minigameResult?: boolean; minigameType?: string }): void {
-    if (data?.fromMinigame) {
-      if (data.minigameResult) {
-        this.gameState.score += 100;
-        this.gameState.stress = Math.max(0, this.gameState.stress - 10);
-        this.gameState.focus = Math.min(100, this.gameState.focus + 15);
-        if (data.minigameType) {
-          this.gameState.minigamesCompleted.push(data.minigameType);
-        }
-      } else {
-        this.gameState.stress = Math.min(100, this.gameState.stress + 5);
-      }
+    if (data?.fromMinigame && OfficeScene.savedGameState) {
+      // Restaurar estado guardado si venimos de un minijuego
+      this.gameState = { ...OfficeScene.savedGameState };
+      this.handleReturnFromMinigame(data);
+    } else {
+      // Reiniciar stats (nuevo juego o reintentar nivel)
+      this.gameState = {
+        energy: 80,
+        coffee: 50,
+        hunger: 30,
+        sleep: 20,
+        focus: 70,
+        stress: 10,
+        karenometer: 0,
+        happiness: 50,
+        score: 0,
+        coffeesToday: 0,
+        minigamesCompleted: [],
+        startTime: 0
+      };
     }
   }
 
@@ -256,8 +269,13 @@ export class OfficeScene extends Phaser.Scene {
     this.becatinEventsSystem = new BecatinEventsSystem(this);
 
     // Controles teclado
-    this.cursors = this.input.keyboard!.createCursorKeys();
-    this.interactKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+    if (this.input.keyboard) {
+      this.input.keyboard.enabled = true;
+      this.cursors = this.input.keyboard.createCursorKeys();
+      this.interactKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+    }
+    // Asegurar que el canvas tiene foco para recibir input
+    this.game.canvas.focus();
 
     // Mundo y cámara
     const worldWidth = this.officeMap[0].length * tileSize;
@@ -281,6 +299,14 @@ export class OfficeScene extends Phaser.Scene {
       onDayEnd: () => this.handleDayEnd()
     });
 
+    // Restaurar tiempo guardado si venimos de un minijuego
+    if (OfficeScene.savedTimeMinutes >= 0) {
+      this.timeSystem.setCurrentMinutes(OfficeScene.savedTimeMinutes);
+      this.hudSystem.updateClock(this.timeSystem.getTimeString());
+      OfficeScene.savedTimeMinutes = -1;
+      OfficeScene.savedGameState = null;
+    }
+
     this.karenSystem = new KarenSystem(this);
     this.karenSystem.start((msg: KarenMessage) => this.handleKarenMessage(msg));
 
@@ -300,6 +326,12 @@ export class OfficeScene extends Phaser.Scene {
     this.progressionSystem = new ProgressionSystem();
     const difficulty = this.progressionSystem.getDifficulty();
     this.availableMinigames = this.mapMinigameScenes(this.progressionSystem.getAvailableMinigames());
+
+    // Mostrar nivel actual en el HUD (diferido para asegurar que HudScene esté lista)
+    const currentLevel = this.progressionSystem.getCurrentLevel();
+    this.time.delayedCall(100, () => {
+      this.hudSystem.updateLevel(currentLevel.name);
+    });
 
     this.npcSystem = new NpcSystem(this);
     this.choiceDialogSystem = new ChoiceDialogSystem(this);
@@ -451,7 +483,7 @@ export class OfficeScene extends Phaser.Scene {
     }
 
     // Verificar que michi y sus animaciones estén listos
-    if (!this.michi || !this.michi.anims) {
+    if (!this.michi || !this.michi.anims || !this.michi.body) {
       return;
     }
 
@@ -538,15 +570,31 @@ export class OfficeScene extends Phaser.Scene {
   }
 
   private startMinigame(): void {
-    this.timeSystem.pause();
-    this.karenSystem.stop();
-    this.npcSystem.stop();
-    this.eventsSystem.stop();
-    this.hudSystem.destroy();
+    // Guardar estado actual antes de ir al minijuego
+    OfficeScene.savedTimeMinutes = this.timeSystem.getCurrentMinutes();
+    OfficeScene.savedGameState = { ...this.gameState };
 
     // Elegir minijuego aleatorio de los disponibles
     const scene = this.availableMinigames[Math.floor(Math.random() * this.availableMinigames.length)];
     this.scene.start(scene, { returnScene: 'OfficeScene' });
+  }
+
+  /**
+   * Maneja el regreso de un minijuego: aplica recompensas y reanuda sistemas.
+   */
+  private handleReturnFromMinigame(data?: { fromMinigame?: boolean; minigameResult?: boolean; minigameType?: string }): void {
+    if (data?.fromMinigame && data.minigameResult) {
+      this.gameState.score += 100;
+      this.gameState.stress = Math.max(0, this.gameState.stress - 10);
+      this.gameState.focus = Math.min(100, this.gameState.focus + 15);
+      // +30 minutos avanzados: completar el minijuego acelera el día (más cerca de las 18:00)
+      OfficeScene.savedTimeMinutes = Math.min(539, OfficeScene.savedTimeMinutes + 30);
+      if (data.minigameType) {
+        this.gameState.minigamesCompleted.push(data.minigameType);
+      }
+    } else if (data?.fromMinigame) {
+      this.gameState.stress = Math.min(100, this.gameState.stress + 5);
+    }
   }
 
   private handleKarenMessage(msg: KarenMessage): void {
@@ -864,42 +912,14 @@ export class OfficeScene extends Phaser.Scene {
 
     this.audioSystem.playGameOver();
 
-    const { width, height } = this.cameras.main;
-    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.85)
-      .setScrollFactor(0).setDepth(2000);
+    // Limpiar estado guardado
+    OfficeScene.savedTimeMinutes = -1;
+    OfficeScene.savedGameState = null;
 
-    this.add.text(width / 2, height / 2 - 60,
-      `😿 Michi renunció...\nRazón: ${reason}\nPuntaje: ${this.gameState.score}`,
-      { fontSize: '16px', color: '#FF4444', align: 'center' }
-    ).setOrigin(0.5).setScrollFactor(0).setDepth(2001);
-
-    this.add.text(width / 2, height / 2 + 10,
-      '¿Quieres intentarlo de nuevo?',
-      { fontSize: '15px', color: '#FFFFFF', align: 'center' }
-    ).setOrigin(0.5).setScrollFactor(0).setDepth(2001);
-
-    // Botón: Reintentar mismo nivel
-    const retryBtn = this.add.text(width / 2, height / 2 + 55, '🔄  Reintentar nivel', {
-      fontSize: '16px', color: '#00FF88', backgroundColor: '#003322',
-      padding: { x: 20, y: 10 }
-    }).setOrigin(0.5).setScrollFactor(0).setDepth(2001).setInteractive({ useHandCursor: true });
-
-    retryBtn.on('pointerover', () => retryBtn.setStyle({ backgroundColor: '#005533' }));
-    retryBtn.on('pointerout', () => retryBtn.setStyle({ backgroundColor: '#003322' }));
-    retryBtn.on('pointerdown', () => {
-      this.scene.start('OfficeScene');
-    });
-
-    // Botón: Volver al menú
-    const menuBtn = this.add.text(width / 2, height / 2 + 105, '🏠  Volver al inicio', {
-      fontSize: '16px', color: '#AAAAAA', backgroundColor: '#222233',
-      padding: { x: 20, y: 10 }
-    }).setOrigin(0.5).setScrollFactor(0).setDepth(2001).setInteractive({ useHandCursor: true });
-
-    menuBtn.on('pointerover', () => menuBtn.setStyle({ backgroundColor: '#333344', color: '#FFFFFF' }));
-    menuBtn.on('pointerout', () => menuBtn.setStyle({ backgroundColor: '#222233', color: '#AAAAAA' }));
-    menuBtn.on('pointerdown', () => {
-      this.scene.start('MenuScene');
+    // Transicionar a la escena de Game Over
+    this.scene.start('GameOverScene', {
+      reason,
+      score: this.gameState.score
     });
   }
 
@@ -1024,22 +1044,14 @@ export class OfficeScene extends Phaser.Scene {
    * Crea el área de comida (refrigerador/snacks)
    */
   private createFoodArea(x: number, y: number): void {
-    // Crear sprite de área de comida usando gráficos programáticos
-    const foodArea = this.add.graphics();
-    // Refrigerador/dispensador de snacks
-    foodArea.fillStyle(0x445566, 1);
-    foodArea.fillRoundedRect(x - 14, y - 20, 28, 36, 4);
-    foodArea.fillStyle(0x556677, 1);
-    foodArea.fillRoundedRect(x - 12, y - 18, 24, 15, 3);
-    foodArea.fillStyle(0x667788, 1);
-    foodArea.fillRoundedRect(x - 12, y, 24, 13, 3);
-    // Manija
-    foodArea.fillStyle(0xCCCCCC, 1);
-    foodArea.fillRect(x + 8, y - 10, 2, 6);
-    foodArea.fillRect(x + 8, y + 3, 2, 6);
+    // Crear un sprite simple para la zona de comida (usando un tile genérico como base)
+    const foodSprite = this.add.sprite(x, y, 'office-tiles', 0);
+    foodSprite.setTint(0x88AA66);
+    this.officeObjects.push(foodSprite);
 
-    // Emoji de comida encima
-    this.add.text(x, y - 28, '🍕', { fontSize: '14px' }).setOrigin(0.5);
+    // Emoji de comida encima para identificar la zona
+    this.add.text(x, y - 10, '🍕', { fontSize: '20px' }).setOrigin(0.5);
+    this.add.text(x, y + 12, 'Snacks', { fontSize: '8px', color: '#AAFFAA' }).setOrigin(0.5);
 
     // Zona de interacción
     const zone = this.add.zone(x, y, 64, 64);

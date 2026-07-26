@@ -233,10 +233,8 @@ export class GitBasicScene extends Phaser.Scene {
   }
 
   private exitMinigame(success: boolean): void {
-    this.scene.start(this.returnScene, { 
-      fromMinigame: true, 
-      minigameResult: success,
-      minigameType: 'git-basic'
+    this.scene.start(this.returnScene, {
+      fromMinigame: true, minigameResult: success, minigameType: 'git-basic'
     });
   }
 

@@ -52,6 +52,9 @@ export class MichiNewsNpc {
   // Referencias externas
   private walls: Phaser.Physics.Arcade.StaticGroup;
   private onGossipCallback: ((effects: any, message: string) => void) | null = null;
+  
+  // Posición fija para el diálogo (evita micro-movimientos)
+  private fixedDialogPosition: { x: number; y: number } | null = null;
 
   constructor(
     scene: Phaser.Scene,
@@ -141,6 +144,19 @@ export class MichiNewsNpc {
       });
       
       console.log('[MichiNewsNpc] Animaciones de Michi News creadas');
+    }
+    
+    // DIAGNÓSTICO: Verificar si los frames tienen offsets diferentes
+    const texture = this.scene.textures.get('michi-news-spritesheet');
+    if (texture && texture.frames) {
+      console.log('[MichiNewsNpc] DIAGNÓSTICO - Frame info:');
+      for (let i = 0; i <= 3; i++) {
+        const frameName = `__BASE${i}`;
+        const frame = (texture.frames as any)[frameName];
+        if (frame) {
+          console.log(`Frame ${i}: x=${frame.x}, y=${frame.y}, width=${frame.width}, height=${frame.height}`);
+        }
+      }
     }
   }
   /**
@@ -232,11 +248,40 @@ export class MichiNewsNpc {
    * Actualiza cuando está esperando respuesta
    */
   private updateWaitingResponse(time: number): void {
-    // Mantener posición y animación excited
+    // DIAGNÓSTICO: Verificar si hay movimiento no deseado
+    const currentX = this.sprite.x;
+    const currentY = this.sprite.y;
+    const velocityX = this.body.velocity.x;
+    const velocityY = this.body.velocity.y;
+    
+    // Logs para detectar deriva o movimiento no deseado
+    if (Math.abs(velocityX) > 0.1 || Math.abs(velocityY) > 0.1) {
+      console.warn(`[MichiNewsNpc] MOVIMIENTO DETECTADO en waiting_response - Velocidad: (${velocityX}, ${velocityY})`);
+    }
+    
+    // SOLUCIÓN DEFINITIVA: Fijar posición absoluta para evitar deriva por decimales
+    if (!this.fixedDialogPosition) {
+      this.fixedDialogPosition = { x: Math.round(currentX), y: Math.round(currentY) };
+      console.log(`[MichiNewsNpc] POSICIÓN FIJADA para diálogo: (${this.fixedDialogPosition.x}, ${this.fixedDialogPosition.y})`);
+    }
+    
+    // Forzar posición exacta cada frame
+    this.sprite.setPosition(this.fixedDialogPosition.x, this.fixedDialogPosition.y);
+    
+    // Mantener velocidad en cero absoluto
     this.body.setVelocity(0, 0);
     
-    // Actualizar depth sorting incluso cuando está quieto
-    this.updateDepthSorting();
+    // Log cada 2 segundos para verificar posición estable (ahora debería ser exacta)
+    if (Math.floor(time / 2000) !== Math.floor((time - 16) / 2000)) {
+      console.log(`[MichiNewsNpc] POSICIÓN FIJA en waiting_response: (${this.fixedDialogPosition.x}, ${this.fixedDialogPosition.y})`);
+    }
+    
+    // Actualizar depth sorting una sola vez al fijar la posición para evitar corte visual
+    if (this.fixedDialogPosition) {
+      const baseDepth = 100;
+      const newDepth = baseDepth + Math.floor(this.fixedDialogPosition.y);
+      this.sprite.setDepth(newDepth);
+    }
     
     // Verificar timeout (se maneja en showGossipBubble)
     // La lógica de timeout está en el delayedCall
@@ -263,10 +308,13 @@ export class MichiNewsNpc {
       this.targetPosition.x, this.targetPosition.y
     );
     
+    console.log(`[MichiNewsNpc] Caminando hacia Michi - Posición actual:(${currentPos.x.toFixed(1)}, ${currentPos.y.toFixed(1)}) | Target:(${this.targetPosition.x}, ${this.targetPosition.y}) | Distancia: ${distance.toFixed(1)}`);
+    
     // Actualizar depth basado en posición Y (Y-sorting para juegos isométricos)
     this.updateDepthSorting();
     
     if (distance < 35) { // Aumentar distancia para evitar superposición
+      console.log(`[MichiNewsNpc] LLEGÓ AL TARGET - Cambiando a mostrar globo`);
       this.showGossipBubble(); // Llegó cerca de Michi - mostrar chisme
     } else {
       this.moveTowardsTarget(); // Continuar caminando
@@ -280,8 +328,14 @@ export class MichiNewsNpc {
   private updateDepthSorting(): void {
     // Base depth + posición Y para sorting automático
     const baseDepth = 100;
+    const previousDepth = this.sprite.depth;
     const newDepth = baseDepth + Math.floor(this.sprite.y);
-    this.sprite.setDepth(newDepth);
+    
+    // Solo actualizar si hay cambio significativo de depth
+    if (Math.abs(newDepth - previousDepth) > 1) {
+      console.log(`[MichiNewsNpc] DEPTH SORTING - Y:${this.sprite.y} | Depth anterior:${previousDepth} -> nuevo:${newDepth}`);
+      this.sprite.setDepth(newDepth);
+    }
     
     // También actualizar depth del Michi Godin para que respete el sorting
     const michiDepth = baseDepth + Math.floor(this.michiSprite.y);
@@ -294,10 +348,28 @@ export class MichiNewsNpc {
   private showGossipBubble(): void {
     this.currentState = 'waiting_response';
     this.waitStartTime = this.scene.time.now;
+    
+    // DIAGNÓSTICO: Detener completamente el movimiento
     this.body.setVelocity(0, 0);
+    
+    // DIAGNÓSTICO: Fijar posición exacta para evitar deriva
+    const currentX = this.sprite.x;
+    const currentY = this.sprite.y;
+    console.log(`[MichiNewsNpc] ANTES de mostrar globo - Posición: (${currentX}, ${currentY})`);
+    console.log(`[MichiNewsNpc] ANTES de mostrar globo - Velocidad: (${this.body.velocity.x}, ${this.body.velocity.y})`);
+    
+    // Fijar posición para evitar cualquier deriva
+    this.sprite.setPosition(currentX, currentY);
+    this.targetPosition = null; // Limpiar objetivo de movimiento
+    
     this.sprite.play('michi-news-excited', true);
     
     console.log('[MichiNewsNpc] Mostrando chisme:', this.currentGossip);
+    console.log(`[MichiNewsNpc] Estado cambiado a: ${this.currentState}`);
+    
+    // POSIBLE FIX: Desactivar cuerpo físico temporalmente para evitar deriva por colisiones
+    this.body.setEnable(false);
+    console.log(`[MichiNewsNpc] Cuerpo físico desactivado durante diálogo`);
     
     // Mostrar globo interactivo con botón Aceptar
     if ((this.scene as any).interactiveBubble) {
@@ -392,6 +464,13 @@ export class MichiNewsNpc {
     this.stateStartTime = this.scene.time.now;
     this.sprite.play('michi-news-excited', true);
     
+    // Limpiar posición fija del diálogo
+    this.fixedDialogPosition = null;
+    
+    // Reactivar cuerpo físico para el movimiento de regreso
+    this.body.setEnable(true);
+    console.log(`[MichiNewsNpc] Cuerpo físico reactivado después del diálogo`);
+    
     // Aplicar efectos
     const effects = { happiness: 5, stress: -3, energy: -2 };
     if (this.onGossipCallback) {
@@ -412,6 +491,14 @@ export class MichiNewsNpc {
   private onGossipRejected(): void {
     this.currentState = 'sad_returning';
     this.sprite.play('michi-news-sad', true);
+    
+    // Limpiar posición fija del diálogo
+    this.fixedDialogPosition = null;
+    
+    // Reactivar cuerpo físico para el movimiento de regreso
+    this.body.setEnable(true);
+    console.log(`[MichiNewsNpc] Cuerpo físico reactivado después de rechazo`);
+    
     this.startReturningToDesk('sad_returning');
     
     console.log('[MichiNewsNpc] Chisme rechazado - Michi News está triste');

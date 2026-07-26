@@ -385,6 +385,11 @@ export class ChoiceDialogSystem {
   private hide(): void {
     console.log('[ChoiceDialogSystem] Ocultando diálogo');
     
+    // IMPORTANTE: Cambiar estado INMEDIATAMENTE para desbloquear el update de la escena
+    this.isActive = false;
+    this.currentDialog = null;
+    console.log('[ChoiceDialogSystem] isActive=false - Juego desbloqueado');
+    
     if (this.container) {
       this.scene.tweens.add({
         targets: this.container,
@@ -415,12 +420,8 @@ export class ChoiceDialogSystem {
       });
     }
 
-    // NO resetear todas las teclas - eso rompe los controles de movimiento
-    // Solo los listeners del diálogo se eliminan automáticamente cuando se destruye el container
-
-    this.isActive = false;
-    this.currentDialog = null;
-    console.log('[ChoiceDialogSystem] Diálogo cerrado, isActive=false');
+    // NO resetear las teclas - eso afectaría los controles de movimiento
+    console.log('[ChoiceDialogSystem] Diálogo cerrado completamente');
   }
 
   /**
@@ -445,9 +446,9 @@ export class ChoiceDialogSystem {
   private createMichiNewsSprite(): void {
     console.log('[ChoiceDialogSystem] Intentando crear sprite de Michi News');
     
-    // Verificar que el texture exista
-    if (!this.scene.textures.exists('michi-news')) {
-      console.error('[ChoiceDialogSystem] Texture "michi-news" no existe. Debe cargarse en preload()');
+    // Verificar que el texture exista (usar el spritesheet correcto)
+    if (!this.scene.textures.exists('michi-news-spritesheet')) {
+      console.error('[ChoiceDialogSystem] Texture "michi-news-spritesheet" no existe. Debe cargarse en preload()');
       return;
     }
 
@@ -457,7 +458,7 @@ export class ChoiceDialogSystem {
     const x = 55;
     const y = 150;
 
-    this.michiNewsSprite = this.scene.add.sprite(x, y, 'michi-news');
+    this.michiNewsSprite = this.scene.add.sprite(x, y, 'michi-news-spritesheet', 24); // Frame 24 = excited
     this.michiNewsSprite.setScale(0.15); // Ajustar escala
     this.michiNewsSprite.setScrollFactor(0);
     // Depth por encima del overlay del diálogo (2000) para que sea visible

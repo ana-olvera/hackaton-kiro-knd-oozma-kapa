@@ -125,6 +125,8 @@ export class OfficeScene extends Phaser.Scene {
   ];
 
   private walls!: Phaser.Physics.Arcade.StaticGroup;
+  // Grupo separado para escritorios (permite que NPCs no colisionen con su propio escritorio)
+  private desks!: Phaser.Physics.Arcade.StaticGroup;
 
   constructor() {
     super({ key: 'OfficeScene' });
@@ -218,6 +220,7 @@ export class OfficeScene extends Phaser.Scene {
 
     // Física
     this.walls = this.physics.add.staticGroup();
+    this.desks = this.physics.add.staticGroup();
 
     // Renderizar tilemap con nuevos sprites cyberpunk
     for (let row = 0; row < this.officeMap.length; row++) {
@@ -249,9 +252,9 @@ export class OfficeScene extends Phaser.Scene {
       }
     }
 
-    // Michi - posicionado en su escritorio (de pie, no sentado)
+    // Michi - posicionado enfrente de su escritorio (de pie, no encima)
     const michiStartX = OfficeScene.DESK_POSITIONS.MICHI_GODIN.X;
-    const michiStartY = OfficeScene.DESK_POSITIONS.MICHI_GODIN.Y; // 40px enfrente del escritorio
+    const michiStartY = OfficeScene.DESK_POSITIONS.MICHI_GODIN.Y + 40; // 40px enfrente del escritorio
     this.michi = this.add.sprite(michiStartX, michiStartY, 'michi-spritesheet', 0);
     this.michi.setScale(0.3);
     this.physics.add.existing(this.michi);
@@ -260,6 +263,8 @@ export class OfficeScene extends Phaser.Scene {
     michiBody.setOffset(18, 14);
     michiBody.setCollideWorldBounds(true);
     this.physics.add.collider(this.michi, this.walls);
+    // Michi colisiona con escritorios (no puede atravesarlos)
+    this.physics.add.collider(this.michi, this.desks);
     this.createMichiAnimations();
 
     // Crear animaciones de personajes
@@ -286,6 +291,10 @@ export class OfficeScene extends Phaser.Scene {
       this.walls, 
       this.michi
     );
+
+    // NPCs colisionan con escritorios de otros (evitar atravesarlos)
+    this.physics.add.collider(this.karenNpc.getSprite(), this.desks);
+    this.physics.add.collider(this.becatinNpc.getSprite(), this.desks);
 
     // Sistema completo de Michi News NPC con chismes y globos interactivos
     console.log('[OfficeScene] Creando sistema Michi News NPC');
@@ -321,8 +330,9 @@ export class OfficeScene extends Phaser.Scene {
       console.log('[OfficeScene] Efectos del chisme aplicados:', effects);
       console.log('[OfficeScene] Mensaje:', message);
     });
-    this.physics.add.collider(this.michiNewsSprite, this.walls);
-    this.physics.add.collider(this.michiNewsSprite, this.michi);
+    // NOTA: Las colisiones de Michi News se configuran dentro de MichiNewsNpc constructor
+    // Michi News también colisiona con escritorios de otros NPCs
+    this.physics.add.collider(this.michiNewsSprite, this.desks);
 
     // Sistema de globos de mensaje de Karen
     this.karenMessageBubble = new KarenMessageBubble(this);
@@ -1114,7 +1124,23 @@ export class OfficeScene extends Phaser.Scene {
       .setOrigin(0.5, 0.9); // Ajustar origen para mejor posicionamiento
     
     this.officeObjects.push(desk);
-    this.walls.add(desk); // Los escritorios son obstáculos
+    this.desks.add(desk); // Escritorios van en grupo separado (no en walls)
+
+    // Ajustar hitbox del escritorio: tamaño fijo proporcional al tile
+    const deskBody = desk.body as Phaser.Physics.Arcade.StaticBody;
+    if (deskBody) {
+      // Hitbox fijo de 30x16px centrado en la base del escritorio
+      const hitboxWidth = 30;
+      const hitboxHeight = 16;
+      deskBody.setSize(hitboxWidth, hitboxHeight);
+      // Centrar el hitbox en la posición del sprite (usar width/height originales para offset)
+      deskBody.setOffset(
+        (desk.width * 0.5) - (hitboxWidth / 2),
+        (desk.height * 0.9) - (hitboxHeight / 2)
+      );
+      // Sincronizar posición del body con el sprite
+      deskBody.updateFromGameObject();
+    }
 
     // Crear zona de interacción solo para el escritorio de Michi Godin
     if (isInteractive) {
@@ -1129,11 +1155,26 @@ export class OfficeScene extends Phaser.Scene {
   private createCoffeeArea(x: number, y: number): void {
     // Usar la nueva estación de café cyberpunk con ajustes para evitar recorte
     const coffeeStation = this.add.sprite(x, y - 12, 'coffee-station') // Subir 12px para evitar corte inferior
-      .setScale(0.1) // Escala apropiada (incrementada de 0.09 a 0.5)
+      .setScale(0.1) // Escala apropiada
       .setOrigin(0.5, 0.8); // Ajustar origen para mejor posicionamiento
     
     this.officeObjects.push(coffeeStation);
     this.walls.add(coffeeStation); // La estación de café es un obstáculo
+
+    // Ajustar hitbox de la cafetera: tamaño fijo basado en visual real
+    const coffeeBody = coffeeStation.body as Phaser.Physics.Arcade.StaticBody;
+    if (coffeeBody) {
+      // Usar tamaño fijo proporcional al tile (32px) para evitar muros invisibles
+      const hitboxWidth = 28;
+      const hitboxHeight = 16;
+      coffeeBody.setSize(hitboxWidth, hitboxHeight);
+      // Centrar el hitbox en la posición del sprite
+      coffeeBody.setOffset(
+        (coffeeStation.width * 0.5) - (hitboxWidth / 2),
+        (coffeeStation.height * 0.8) - (hitboxHeight / 2)
+      );
+      coffeeBody.updateFromGameObject();
+    }
 
     // Zona de interacción para tomar café
     const zone = this.add.zone(x, y, 64, 64); // Zona más grande para facilitar acceso

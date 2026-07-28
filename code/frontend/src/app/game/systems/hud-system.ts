@@ -96,8 +96,8 @@ export class HudScene extends Phaser.Scene {
 
     // Retrato emocional (esquina superior derecha)
     const portraitX = 730;
-    const portraitY = 50;
-    const portraitSize = 70;
+    const portraitY = 55;
+    const portraitSize = 80;
 
     const portraitBg = this.add.rectangle(portraitX, portraitY, portraitSize + 10, portraitSize + 10, 0x000000, 0.8);
     portraitBg.setStrokeStyle(1, 0x333366);
@@ -108,16 +108,17 @@ export class HudScene extends Phaser.Scene {
     // Cargar retrato desde atlas
     if (this.textures.exists('michi-emotions')) {
       this.portraitImage = this.add.image(portraitX, portraitY, 'michi-emotions', 'happy');
-      // Escalar proporcionalmente al tamaño del frame
       const frame = this.portraitImage.frame;
-      const scale = Math.min(portraitSize / frame.width, portraitSize / frame.height);
+      // Escalar para que el frame completo quepa dentro del portraitSize
+      const scale = portraitSize / Math.max(frame.width, frame.height);
       this.portraitImage.setScale(scale);
+      this.portraitImage.setOrigin(0.5, 0.5);
     } else {
       // Fallback: texto emoji
       this.add.text(portraitX, portraitY, '🐱', { fontSize: '32px' }).setOrigin(0.5);
     }
 
-    this.emotionLabel = this.add.text(portraitX, portraitY + portraitSize / 2 + 12, 'Feliz', {
+    this.emotionLabel = this.add.text(portraitX, portraitY + portraitSize / 2 + 14, 'Feliz', {
       fontSize: '12px',
       color: '#00FF88'
     }).setOrigin(0.5);
@@ -209,11 +210,12 @@ export class HudScene extends Phaser.Scene {
   updatePortrait(emotion: string): void {
     if (this.portraitImage && this.textures.exists('michi-emotions')) {
       this.portraitImage.setTexture('michi-emotions', emotion);
-      // Re-escalar proporcional al nuevo frame
+      // Re-escalar proporcional al nuevo frame asegurando que quepa completo
       const frame = this.portraitImage.frame;
-      const portraitSize = 70;
-      const scale = Math.min(portraitSize / frame.width, portraitSize / frame.height);
+      const portraitSize = 80;
+      const scale = portraitSize / Math.max(frame.width, frame.height);
       this.portraitImage.setScale(scale);
+      this.portraitImage.setOrigin(0.5, 0.5);
     }
 
     if (this.emotionLabel) {
@@ -224,7 +226,7 @@ export class HudScene extends Phaser.Scene {
       this.portraitBorder.setStrokeStyle(2, this.getEmotionColor(emotion));
     }
 
-    // Bounce
+    // Animación de rebote
     if (this.portraitImage) {
       this.tweens.add({
         targets: this.portraitImage,

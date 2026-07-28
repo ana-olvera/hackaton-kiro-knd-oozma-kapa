@@ -1049,6 +1049,41 @@ export class OfficeScene extends Phaser.Scene {
   }
 
   /**
+   * Sistema global de depth sorting para todos los personajes.
+   * Regla: mientras más abajo (mayor Y), mayor depth (se dibuja encima).
+   * Esto asegura que los personajes se superpongan correctamente al caminar.
+   */
+  private updateGlobalDepthSorting(): void {
+    const baseDepth = 100;
+
+    // Michi Godin
+    if (this.michi && this.michi.active) {
+      this.michi.setDepth(baseDepth + Math.floor(this.michi.y));
+    }
+
+    // Karen NPC
+    try {
+      const karenSprite = this.karenNpc.getSprite();
+      if (karenSprite && karenSprite.active) {
+        karenSprite.setDepth(baseDepth + Math.floor(karenSprite.y));
+      }
+    } catch (_) { /* Karen puede estar destruida al final del día */ }
+
+    // Becatín NPC
+    try {
+      const becatinSprite = this.becatinNpc.getSprite();
+      if (becatinSprite && becatinSprite.active) {
+        becatinSprite.setDepth(baseDepth + Math.floor(becatinSprite.y));
+      }
+    } catch (_) { /* Becatín puede estar destruido al final del día */ }
+
+    // Michi News NPC
+    if (this.michiNewsSprite && this.michiNewsSprite.active) {
+      this.michiNewsSprite.setDepth(baseDepth + Math.floor(this.michiNewsSprite.y));
+    }
+  }
+
+  /**
    * Crea un escritorio personalizado según la ubicación en el mapa
    */
   private createCustomDesk(row: number, col: number, x: number, y: number): void {

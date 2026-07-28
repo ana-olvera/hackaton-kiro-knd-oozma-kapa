@@ -627,7 +627,8 @@ export class OfficeScene extends Phaser.Scene {
   private checkInteraction(): void {
     for (const { zone, type } of this.interactionZones) {
       const dist = Phaser.Math.Distance.Between(this.michi.x, this.michi.y, zone.x, zone.y);
-      if (dist < 48) {
+      // Radio de 64px para permitir interacción estando enfrente del objeto
+      if (dist < 64) {
         if (type === 'coffee') this.collectCoffee(zone.x, zone.y);
         else if (type === 'computer') this.startMinigame();
         else if (type === 'food') this.eatFood(zone.x, zone.y);
@@ -1118,33 +1119,22 @@ export class OfficeScene extends Phaser.Scene {
       deskSprite = 'desk-generic-1'; // Fallback
     }
 
-    // Crear sprite del escritorio con ajustes para evitar recorte
+    // Crear sprite del escritorio (solo visual, sin colisión directa)
     const desk = this.add.sprite(x, y - 8, deskSprite) // Subir 8px para evitar corte inferior
       .setScale(0.1) // Escala apropiada
       .setOrigin(0.5, 0.9); // Ajustar origen para mejor posicionamiento
     
     this.officeObjects.push(desk);
-    this.desks.add(desk); // Escritorios van en grupo separado (no en walls)
 
-    // Ajustar hitbox del escritorio: tamaño fijo proporcional al tile
-    const deskBody = desk.body as Phaser.Physics.Arcade.StaticBody;
-    if (deskBody) {
-      // Hitbox fijo de 30x16px centrado en la base del escritorio
-      const hitboxWidth = 30;
-      const hitboxHeight = 16;
-      deskBody.setSize(hitboxWidth, hitboxHeight);
-      // Centrar el hitbox en la posición del sprite (usar width/height originales para offset)
-      deskBody.setOffset(
-        (desk.width * 0.5) - (hitboxWidth / 2),
-        (desk.height * 0.9) - (hitboxHeight / 2)
-      );
-      // Sincronizar posición del body con el sprite
-      deskBody.updateFromGameObject();
-    }
+    // Crear hitbox invisible separado del sprite (evita problemas con scale)
+    const hitbox = this.add.zone(x, y - 4, 30, 20); // Hitbox pequeño centrado en la base del escritorio
+    this.physics.add.existing(hitbox, true); // true = estático
+    this.desks.add(hitbox);
 
     // Crear zona de interacción solo para el escritorio de Michi Godin
     if (isInteractive) {
-      const zone = this.add.zone(x, y, 64, 64); // Zona más grande para facilitar interacción
+      // Zona posicionada enfrente del escritorio (y + 40) donde Michi puede alcanzarla
+      const zone = this.add.zone(x, y + 40, 64, 64);
       this.interactionZones.push({ zone, type: 'computer' });
     }
   }
@@ -1153,31 +1143,20 @@ export class OfficeScene extends Phaser.Scene {
    * Crea el área de cafetera común
    */
   private createCoffeeArea(x: number, y: number): void {
-    // Usar la nueva estación de café cyberpunk con ajustes para evitar recorte
+    // Crear sprite de la estación de café (solo visual)
     const coffeeStation = this.add.sprite(x, y - 12, 'coffee-station') // Subir 12px para evitar corte inferior
       .setScale(0.1) // Escala apropiada
       .setOrigin(0.5, 0.8); // Ajustar origen para mejor posicionamiento
     
     this.officeObjects.push(coffeeStation);
-    this.walls.add(coffeeStation); // La estación de café es un obstáculo
 
-    // Ajustar hitbox de la cafetera: tamaño fijo basado en visual real
-    const coffeeBody = coffeeStation.body as Phaser.Physics.Arcade.StaticBody;
-    if (coffeeBody) {
-      // Usar tamaño fijo proporcional al tile (32px) para evitar muros invisibles
-      const hitboxWidth = 28;
-      const hitboxHeight = 16;
-      coffeeBody.setSize(hitboxWidth, hitboxHeight);
-      // Centrar el hitbox en la posición del sprite
-      coffeeBody.setOffset(
-        (coffeeStation.width * 0.5) - (hitboxWidth / 2),
-        (coffeeStation.height * 0.8) - (hitboxHeight / 2)
-      );
-      coffeeBody.updateFromGameObject();
-    }
+    // Crear hitbox invisible separado del sprite (evita problemas con scale)
+    const hitbox = this.add.zone(x, y - 4, 28, 18);
+    this.physics.add.existing(hitbox, true); // true = estático
+    this.walls.add(hitbox); // La cafetera sigue siendo obstáculo en walls
 
-    // Zona de interacción para tomar café
-    const zone = this.add.zone(x, y, 64, 64); // Zona más grande para facilitar acceso
+    // Zona de interacción para tomar café (desplazada enfrente del sprite)
+    const zone = this.add.zone(x, y + 30, 64, 64);
     this.interactionZones.push({ zone, type: 'coffee' });
   }
 

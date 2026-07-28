@@ -625,10 +625,13 @@ export class OfficeScene extends Phaser.Scene {
   }
 
   private checkInteraction(): void {
+    console.log('[OfficeScene] checkInteraction llamado - Michi en:', this.michi.x.toFixed(0), this.michi.y.toFixed(0));
     for (const { zone, type } of this.interactionZones) {
       const dist = Phaser.Math.Distance.Between(this.michi.x, this.michi.y, zone.x, zone.y);
-      // Radio de 64px para permitir interacción estando enfrente del objeto
-      if (dist < 64) {
+      console.log(`[OfficeScene]   Zona "${type}" en (${zone.x}, ${zone.y}) - dist: ${dist.toFixed(0)}`);
+      // Radio de 80px para detectar interacción al estar cerca o encima del objeto
+      if (dist < 80) {
+        console.log(`[OfficeScene]   ¡INTERACCIÓN DETECTADA! tipo: ${type}`);
         if (type === 'coffee') this.collectCoffee(zone.x, zone.y);
         else if (type === 'computer') this.startMinigame();
         else if (type === 'food') this.eatFood(zone.x, zone.y);
@@ -1133,8 +1136,8 @@ export class OfficeScene extends Phaser.Scene {
 
     // Crear zona de interacción solo para el escritorio de Michi Godin
     if (isInteractive) {
-      // Zona posicionada enfrente del escritorio (y + 40) donde Michi puede alcanzarla
-      const zone = this.add.zone(x, y + 40, 64, 64);
+      // Zona centrada en la posición del escritorio (Michi puede alcanzarla al acercarse)
+      const zone = this.add.zone(x, y, 80, 80);
       this.interactionZones.push({ zone, type: 'computer' });
     }
   }
@@ -1155,8 +1158,8 @@ export class OfficeScene extends Phaser.Scene {
     this.physics.add.existing(hitbox, true); // true = estático
     this.walls.add(hitbox); // La cafetera sigue siendo obstáculo en walls
 
-    // Zona de interacción para tomar café (desplazada enfrente del sprite)
-    const zone = this.add.zone(x, y + 30, 64, 64);
+    // Zona de interacción para tomar café (centrada en la posición del objeto)
+    const zone = this.add.zone(x, y, 80, 80);
     this.interactionZones.push({ zone, type: 'coffee' });
   }
 

@@ -36,45 +36,56 @@ export interface MichiAnimation {
 /**
  * Todas las animaciones disponibles para Michi
  * 
- * MAPA DE ANIMACIONES (según especificaciones):
- * - Row 1 (0-3):   Idle/Reposo - 4 frames [6-8 FPS]
- * - Row 2 (4-7):   Walking/Caminar - 4 frames [8-10 FPS]
- * - Row 3 (8-10):  Sleeping/Dormir - 3 frames [4 FPS] (celda 11 vacía)
- * - Row 4 (12-13): Action A/Trabajo - 2 frames [6 FPS]
- * - Row 4 (14-15): Action B/Beber - 2 frames [4 FPS]
- * - Row 5 (16-19): Reaction 1/Estresado - 4 frames [8 FPS]
- * - Row 6 (20-21): Reaction 2/Confundido - 2 frames [4 FPS]
- * - Row 6 (22-23): Reaction 3/Triste - 2 frames [6 FPS]
- * - Row 7 (24-25): Surprise/Emocionado - 2 frames [6 FPS]
- * - Row 7 (26-27): Joy/Celebrar - 2 frames [6 FPS]
- * - Row 8 (28-29): Wave/Teléfono - 2 frames [4 FPS] (celdas 30-31 vacías)
+ * MAPA DE ANIMACIONES (spritesheet actualizado v2.0):
+ * - Fila 1 (0-3):   Idle/Reposo - De pie con rosquilla rosa, parpadeando [6 FPS]
+ * - Fila 2 (4-7):   Walk/Caminar - De perfil con maletín marrón [8 FPS]
+ * - Fila 3 (8-10):  Sleep/Dormir - De lado con 'ZZZ' [4 FPS] (celda 11 vacía)
+ * - Fila 4 (12-13): Work/Trabajo - Escribiendo enojado en laptop [6 FPS]
+ * - Fila 4 (14-15): Coffee/Café - Tomando café [4 FPS]
+ * - Fila 5 (16-19): Fury/Furia - Cara roja, humo en orejas, golpeando maletín [8 FPS]
+ * - Fila 6 (20-21): Confused/Confundido - Con signos '?' [4 FPS]
+ * - Fila 6 (22-23): Crying/Llorando - Lágrimas grandes [6 FPS]
+ * - Fila 7 (24-25): Surprised/Sorpresa - Con signo '!' [6 FPS]
+ * - Fila 7 (26-27): Greeting/Saludando - Saludo alegre con la mano [6 FPS]
+ * - Fila 8 (28-29): Looking Back/Mirando atrás [4 FPS]
+ * - Fila 8 (30):    Desk Scene/Escritorio - Escena isométrica decorativa [1 FPS] (celda 31 vacía)
  */
 export const MICHI_ANIMATIONS: MichiAnimation[] = [
-  // Row 1: Idle (4 frames) - Loop
+  // Fila 1: Idle - De pie con rosquilla rosa (4 frames) - Loop
   { key: 'michi-idle', startFrame: 0, endFrame: 3, frameRate: 6, repeat: -1 },
   
-  // Row 2: Walk (4 frames) - Loop
+  // Fila 2: Walk - Caminando con maletín (4 frames) - Loop
   { key: 'michi-walk', startFrame: 4, endFrame: 7, frameRate: 8, repeat: -1 },
   
-  // Row 3: Sleep (3 frames) - Loop
+  // Fila 3: Sleep - Durmiendo con ZZZ (3 frames) - Loop
   { key: 'michi-sleep', startFrame: 8, endFrame: 10, frameRate: 4, repeat: -1 },
   
-  // Row 4: Work (2 frames) + Coffee (2 frames) - Loop
+  // Fila 4: Work (2 frames) + Coffee (2 frames) - Loop
   { key: 'michi-work', startFrame: 12, endFrame: 13, frameRate: 6, repeat: -1 },
   { key: 'michi-coffee', startFrame: 14, endFrame: 15, frameRate: 4, repeat: -1 },
   
-  // Row 5: Stressed (4 frames) - Loop
+  // Fila 5: Fury - Furia extrema con cara roja y humo (4 frames) - Loop
+  { key: 'michi-fury', startFrame: 16, endFrame: 19, frameRate: 8, repeat: -1 },
+  // Alias de compatibilidad: 'stressed' apunta a los mismos frames de furia
   { key: 'michi-stressed', startFrame: 16, endFrame: 19, frameRate: 8, repeat: -1 },
   
-  // Row 6: Confused (2 frames) + Sad (2 frames) - Play Once
+  // Fila 6: Confused (2 frames) + Crying (2 frames)
   { key: 'michi-confused', startFrame: 20, endFrame: 21, frameRate: 4, repeat: 0 },
+  { key: 'michi-crying', startFrame: 22, endFrame: 23, frameRate: 6, repeat: -1 },
+  // Alias de compatibilidad: 'sad' apunta a crying
   { key: 'michi-sad', startFrame: 22, endFrame: 23, frameRate: 6, repeat: -1 },
   
-  // Row 7: Excited (2 frames) + Celebrate (2 frames) - Play Once
+  // Fila 7: Surprised (2 frames) + Greeting (2 frames)
+  { key: 'michi-surprised', startFrame: 24, endFrame: 25, frameRate: 6, repeat: 0 },
+  { key: 'michi-greeting', startFrame: 26, endFrame: 27, frameRate: 6, repeat: 0 },
+  // Aliases de compatibilidad
   { key: 'michi-excited', startFrame: 24, endFrame: 25, frameRate: 6, repeat: 0 },
   { key: 'michi-celebrate', startFrame: 26, endFrame: 27, frameRate: 6, repeat: 0 },
   
-  // Row 8: Phone (2 frames) - Loop
+  // Fila 8: Looking Back (2 frames) + Desk Scene (1 frame estático)
+  { key: 'michi-looking-back', startFrame: 28, endFrame: 29, frameRate: 4, repeat: -1 },
+  { key: 'michi-desk-scene', startFrame: 30, endFrame: 30, frameRate: 1, repeat: 0 },
+  // Alias de compatibilidad: 'phone' apunta a looking-back
   { key: 'michi-phone', startFrame: 28, endFrame: 29, frameRate: 4, repeat: -1 }
 ];
 
@@ -131,7 +142,8 @@ export function createMichiAnimations(scene: Phaser.Scene): void {
 }
 
 /**
- * Tipo de estado de Michi para mapear a animaciones
+ * Tipo de estado de Michi para mapear a animaciones.
+ * Incluye estados nuevos del spritesheet v2.0 y aliases de compatibilidad.
  */
 export type MichiState = 
   | 'idle' 
@@ -139,11 +151,17 @@ export type MichiState =
   | 'sleep' 
   | 'work' 
   | 'coffee'
+  | 'fury'
   | 'stressed'
-  | 'celebrate'
   | 'confused'
+  | 'crying'
   | 'sad'
+  | 'surprised'
+  | 'greeting'
   | 'excited'
+  | 'celebrate'
+  | 'looking-back'
+  | 'desk-scene'
   | 'phone';
 
 /**

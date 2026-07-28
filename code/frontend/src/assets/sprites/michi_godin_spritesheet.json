@@ -1,0 +1,215 @@
+{
+  "description": "Documentación de referencia del spritesheet de Michi Godín (Chichi Karen) - NO consumido por Phaser directamente",
+  "spritesheet": {
+    "image": "michi_godin.png",
+    "format": "RGBA8888",
+    "totalSize": { "w": 506, "h": 1024 },
+    "grid": { "columns": 4, "rows": 8, "totalCells": 32 },
+    "cellSize": { "w": 126, "h": 128 },
+    "spacing": 0,
+    "margin": 0,
+    "filterMode": "NEAREST"
+  },
+  "rows": {
+    "row_1": {
+      "name": "idle",
+      "description": "Animación inactiva (idle): Gato calico de pie, mirando al frente, parpadeando suavemente, sosteniendo una rosquilla rosa",
+      "cells": [0, 1, 2, 3],
+      "frameCount": 4,
+      "frameRate": 6,
+      "repeat": -1
+    },
+    "row_2": {
+      "name": "walk",
+      "description": "Animación de caminata con actitud: De perfil, moviéndose hacia la izquierda y derecha, sosteniendo un maletín marrón",
+      "cells": [4, 5, 6, 7],
+      "frameCount": 4,
+      "frameRate": 8,
+      "repeat": -1
+    },
+    "row_3": {
+      "name": "sleep",
+      "description": "Animación de sueño: Gato durmiendo de lado con símbolos 'ZZZ'. Última celda vacía",
+      "cells": [8, 9, 10],
+      "emptyCells": [11],
+      "frameCount": 3,
+      "frameRate": 4,
+      "repeat": -1
+    },
+    "row_4": {
+      "name": "office_interaction",
+      "description": "Interacción de oficina: Primeros 2 sprites - gato enojado escribiendo en computadora portátil. Últimos 2 sprites - gato tomando café",
+      "subAnimations": {
+        "work": {
+          "description": "Gato enojado escribiendo en una computadora portátil de escritorio",
+          "cells": [12, 13],
+          "frameCount": 2,
+          "frameRate": 6,
+          "repeat": -1
+        },
+        "coffee": {
+          "description": "Gato tomando café",
+          "cells": [14, 15],
+          "frameCount": 2,
+          "frameRate": 4,
+          "repeat": -1
+        }
+      }
+    },
+    "row_5": {
+      "name": "fury",
+      "description": "Emoción: Furia/Ira extrema. Gato con cara roja, humo saliendo de las orejas, señalando con el dedo y golpeando el maletín",
+      "cells": [16, 17, 18, 19],
+      "frameCount": 4,
+      "frameRate": 8,
+      "repeat": -1
+    },
+    "row_6": {
+      "name": "confusion_and_sadness",
+      "description": "Primeros 2 sprites de confusión con signos '?', seguidos de 2 sprites de llanto triste con lágrimas grandes",
+      "subAnimations": {
+        "confused": {
+          "description": "Confusión con signos de interrogación '?'",
+          "cells": [20, 21],
+          "frameCount": 2,
+          "frameRate": 4,
+          "repeat": 0
+        },
+        "crying": {
+          "description": "Llanto triste con lágrimas grandes",
+          "cells": [22, 23],
+          "frameCount": 2,
+          "frameRate": 6,
+          "repeat": -1
+        }
+      }
+    },
+    "row_7": {
+      "name": "surprise_and_greeting",
+      "description": "Primeros 2 sprites de sorpresa/impacto con '!', seguidos de 2 sprites saludando alegremente",
+      "subAnimations": {
+        "surprised": {
+          "description": "Sorpresa/impacto con signo de exclamación '!'",
+          "cells": [24, 25],
+          "frameCount": 2,
+          "frameRate": 6,
+          "repeat": 0
+        },
+        "greeting": {
+          "description": "Saludando alegremente con la mano",
+          "cells": [26, 27],
+          "frameCount": 2,
+          "frameRate": 6,
+          "repeat": 0
+        }
+      }
+    },
+    "row_8": {
+      "name": "looking_back_and_desk",
+      "description": "Primeros 2 sprites mirando hacia atrás, seguido de 1 sprite de escena de escritorio isométrica (monitor, teclado, planta y teléfono de disco). Última celda vacía",
+      "subAnimations": {
+        "looking_back": {
+          "description": "Mirando hacia atrás (over the shoulder)",
+          "cells": [28, 29],
+          "frameCount": 2,
+          "frameRate": 4,
+          "repeat": -1
+        },
+        "desk_scene": {
+          "description": "Escena de escritorio de computadora isométrica moderna con monitor, teclado, planta y teléfono de disco",
+          "cells": [30],
+          "frameCount": 1,
+          "frameRate": 1,
+          "repeat": 0,
+          "note": "Frame estático decorativo, no es animación del personaje"
+        }
+      },
+      "emptyCells": [31]
+    }
+  },
+  "animations": {
+    "michi-idle": {
+      "frames": [0, 1, 2, 3],
+      "frameRate": 6,
+      "repeat": -1,
+      "description": "Reposo con rosquilla rosa"
+    },
+    "michi-walk": {
+      "frames": [4, 5, 6, 7],
+      "frameRate": 8,
+      "repeat": -1,
+      "description": "Caminar con maletín"
+    },
+    "michi-sleep": {
+      "frames": [8, 9, 10],
+      "frameRate": 4,
+      "repeat": -1,
+      "description": "Dormir con ZZZ"
+    },
+    "michi-work": {
+      "frames": [12, 13],
+      "frameRate": 6,
+      "repeat": -1,
+      "description": "Escribiendo enojado en laptop"
+    },
+    "michi-coffee": {
+      "frames": [14, 15],
+      "frameRate": 4,
+      "repeat": -1,
+      "description": "Tomando café"
+    },
+    "michi-fury": {
+      "frames": [16, 17, 18, 19],
+      "frameRate": 8,
+      "repeat": -1,
+      "description": "Furia extrema con humo y cara roja"
+    },
+    "michi-confused": {
+      "frames": [20, 21],
+      "frameRate": 4,
+      "repeat": 0,
+      "description": "Confusión con signos '?'"
+    },
+    "michi-crying": {
+      "frames": [22, 23],
+      "frameRate": 6,
+      "repeat": -1,
+      "description": "Llanto con lágrimas grandes"
+    },
+    "michi-surprised": {
+      "frames": [24, 25],
+      "frameRate": 6,
+      "repeat": 0,
+      "description": "Sorpresa con signo '!'"
+    },
+    "michi-greeting": {
+      "frames": [26, 27],
+      "frameRate": 6,
+      "repeat": 0,
+      "description": "Saludando con la mano"
+    },
+    "michi-looking-back": {
+      "frames": [28, 29],
+      "frameRate": 4,
+      "repeat": -1,
+      "description": "Mirando hacia atrás"
+    },
+    "michi-desk-scene": {
+      "frames": [30],
+      "frameRate": 1,
+      "repeat": 0,
+      "description": "Escena decorativa de escritorio isométrico"
+    }
+  },
+  "meta": {
+    "version": "2.0",
+    "character": "Michi Godín (Chichi Karen)",
+    "style": "Pixel art 8-bit kawaii chibi",
+    "characterDescription": "Gato calico beige con parches marrones y lentes rosa neón",
+    "originalImage": "michi_godin.png",
+    "emotionsAtlas": "gestos_michigodin.json",
+    "emotionsImage": "gestos_michigodin.jpeg",
+    "lastUpdated": "2026-07-27",
+    "notes": "Este archivo es documentación de referencia. El atlas de emociones para Phaser está en gestos_michigodin.json. Las animaciones del spritesheet se cargan vía michi-sprite-loader.ts."
+  }
+}

@@ -4,18 +4,18 @@ import * as Phaser from 'phaser';
  * Configuración del spritesheet de Karen
  * 
  * ESPECIFICACIONES TÉCNICAS (según la imagen real michi_karen.png):
- * - Dimensiones totales: 534 x 1080 píxeles
+ * - Dimensiones totales: 720 x 1456 píxeles
  * - Grid: 4 columnas x 8 filas (32 celdas)
- * - Tamaño de cada celda: 133.5 x 135 píxeles (534/4 = 133.5, 1080/8 = 135)
+ * - Tamaño de cada celda: 180 x 182 píxeles (720/4 = 180, 1456/8 = 182)
  * - Origen: Esquina superior izquierda (0,0)
  * - Filter Mode: Point (No Filter) / Nearest Neighbor
  * - Compression: None (RGBA 32-bit)
  */
 
-// Configuración ajustada a las dimensiones reales de la imagen (534x1080)
+// Configuración ajustada a las dimensiones reales de la imagen (720x1456)
 const KAREN_SPRITE_CONFIG = {
-  frameWidth: 133.5,   // Ancho de cada celda (534 / 4 columnas = 133.5)
-  frameHeight: 135,    // Alto de cada celda (1080 / 8 filas = 135)
+  frameWidth: 180,     // Ancho de cada celda (720 / 4 columnas = 180)
+  frameHeight: 182,    // Alto de cada celda (1456 / 8 filas = 182)
   columns: 4,          // Columnas en el spritesheet
   rows: 8,             // Filas en el spritesheet
   spacing: 0,          // Sin espacio entre frames
@@ -88,7 +88,7 @@ export function loadKarenSpritesheet(scene: Phaser.Scene): void {
     return;
   }
 
-  scene.load.spritesheet('karen-spritesheet', 'assets/sprites/michi_karen.png', {
+  scene.load.spritesheet('karen-spritesheet', 'assets/sprites/michi_karen/michi_karen.png', {
     frameWidth: KAREN_SPRITE_CONFIG.frameWidth,
     frameHeight: KAREN_SPRITE_CONFIG.frameHeight,
     startFrame: 0,
@@ -174,9 +174,9 @@ export class KarenSprite {
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     this.sprite = scene.add.sprite(x, y, 'karen-spritesheet');
-    // El sprite de 534x1080 (133.5x135 por frame) se escala para el juego
-    // 135 * 0.25 ≈ 34px (similar al tamaño de Michi para mantener proporción)
-    this.sprite.setScale(0.25);
+    // El sprite de 720x1456 (180x182 por frame) se escala para el juego
+    // 182 * 0.19 ≈ 34px (similar al tamaño de Michi para mantener proporción)
+    this.sprite.setScale(0.19);
     this.playAnimation('idle');
   }
 
@@ -191,6 +191,12 @@ export class KarenSprite {
     
     if (this.sprite.scene.anims.exists(animKey)) {
       this.sprite.play(animKey);
+    } else {
+      // Fallback a idle si la animación no existe
+      const fallbackKey = 'karen-idle';
+      if (this.sprite.scene.anims.exists(fallbackKey)) {
+        this.sprite.play(fallbackKey);
+      }
     }
   }
 
